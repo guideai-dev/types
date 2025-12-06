@@ -1,6 +1,6 @@
 {
   "name": "@guidemode/types",
-  "version": "0.1.42",
+  "version": "0.1.43",
   "description": "Shared TypeScript types for GuideMode",
   "type": "module",
   "main": "./dist/cjs/index.js",
@@ -11,7 +11,8 @@
     "url": "https://github.com/guidemode/types.git"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
   },
   "exports": {
     ".": {
