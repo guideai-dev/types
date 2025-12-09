@@ -91,6 +91,11 @@ export interface DeleteUserResponse {
 }
 
 /**
+ * Home page focus preference for metrics display
+ */
+export type HomeFocusPreference = 'discovery' | 'delivery' | 'both'
+
+/**
  * User settings - personal preferences and configuration
  * Generic structure matching tenant_settings for future extensibility
  */
@@ -99,6 +104,7 @@ export interface UserSettings {
   userId: string
   emailSurveyAssignments: boolean
   emailSurveyReminders: boolean
+  homeFocusPreference: HomeFocusPreference
   createdAt: Date
   updatedAt: Date
 }
@@ -109,6 +115,7 @@ export interface UserSettings {
 export interface UserSettingsUpdate {
   emailSurveyAssignments?: boolean
   emailSurveyReminders?: boolean
+  homeFocusPreference?: HomeFocusPreference
 }
 
 /**

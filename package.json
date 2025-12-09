@@ -41,9 +41,7 @@
       "require": "./dist/cjs/providers/opencode/index.js"
     }
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "build": "pnpm run clean && pnpm run build:esm && pnpm run build:cjs && pnpm run build:cjs-package",
     "build:esm": "tsc -p tsconfig.json",
@@ -59,11 +57,7 @@
   "devDependencies": {
     "typescript": "^5.7.2"
   },
-  "keywords": [
-    "types",
-    "typescript",
-    "guidemode"
-  ],
+  "keywords": ["types", "typescript", "guidemode"],
   "dependencies": {
     "zod": "^3.25.0"
   }
