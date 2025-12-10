@@ -16,6 +16,28 @@ export type IssueState = 'open' | 'closed' | 'in_progress'
 export type IssueType = 'feature' | 'bug' | 'chore' | 'discovery' | 'incident' | 'other'
 
 /**
+ * A state transition event with timestamp
+ * Used for tracking when issues move between states
+ */
+export interface StateTransition {
+  fromState: IssueState | null
+  toState: IssueState
+  timestamp: Date
+}
+
+/**
+ * Issue with full date tracking for analytics
+ * Lead time = createdAt to closedAt
+ * Cycle time = startedAt to closedAt
+ */
+export interface IssueWithDates {
+  createdAt: Date
+  startedAt: Date | null
+  updatedAt: Date
+  closedAt: Date | null
+}
+
+/**
  * Issue record from database
  */
 export interface Issue {
@@ -37,6 +59,7 @@ export interface Issue {
   assigneeCount: number
   commentCount: number
   createdAt: Date
+  startedAt: Date | null // When issue moved to in_progress state
   updatedAt: Date
   closedAt: Date | null
   firstResponseAt: Date | null
@@ -65,6 +88,7 @@ export interface IssueInsert {
   assigneeCount?: number
   commentCount?: number
   createdAt: Date
+  startedAt?: Date | null
   updatedAt: Date
   closedAt?: Date | null
   firstResponseAt?: Date | null
@@ -82,6 +106,7 @@ export interface IssueUpdate {
   authorId?: string | null
   assigneeCount?: number
   commentCount?: number
+  startedAt?: Date | null
   updatedAt?: Date
   closedAt?: Date | null
   firstResponseAt?: Date | null
@@ -114,10 +139,12 @@ export interface IssueResponse {
   commentCount: number
   labels: IssueLabel[]
   createdAt: string
+  startedAt: string | null
   updatedAt: string
   closedAt: string | null
   firstResponseAt: string | null
   leadTimeMs: number | null // Calculated: closedAt - createdAt
+  cycleTimeMs: number | null // Calculated: closedAt - startedAt
   metadata: Record<string, unknown> | null
   lastSyncedAt: string
 }
@@ -172,7 +199,9 @@ export interface IssueMetrics {
   openCount: number
   closedCount: number
   byType: Record<IssueType, number>
-  averageLeadTimeMs: number | null
+  averageLeadTimeMs: number | null // Time from created to closed
   medianLeadTimeMs: number | null
+  averageCycleTimeMs: number | null // Time from started to closed
+  medianCycleTimeMs: number | null
   averageFirstResponseMs: number | null
 }
