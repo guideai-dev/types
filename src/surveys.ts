@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 // Schedule Types
-export type ScheduleType = 'weekly' | 'monthly' | 'triggered'
+export type ScheduleType = 'weekly' | 'biweekly' | 'monthly' | 'triggered'
 export type TargetType = 'organization' | 'teams' | 'individual'
 export type SurveyStatus = 'pending' | 'completed' | 'expired'
 
@@ -80,7 +80,7 @@ const surveyScheduleBaseSchema = z.object({
   purpose: z
     .enum(['discovery', 'delivery', 'whole_team', 'happiness', 'ai_effectiveness'])
     .optional(),
-  scheduleType: z.enum(['weekly', 'monthly', 'triggered']),
+  scheduleType: z.enum(['weekly', 'biweekly', 'monthly', 'triggered']),
   dayOfWeek: z.number().int().min(0).max(6).optional(), // 0=Sunday, 6=Saturday
   dayOfMonth: z.number().int().min(1).max(31).optional(), // Business day 1-31
   timeOfDay: z
@@ -109,6 +109,19 @@ export const surveyScheduleCreateSchema = surveyScheduleBaseSchema
     },
     {
       message: 'Weekly schedules require dayOfWeek and timeOfDay',
+      path: ['dayOfWeek'],
+    }
+  )
+  .refine(
+    data => {
+      // Biweekly schedules must have dayOfWeek and timeOfDay
+      if (data.scheduleType === 'biweekly') {
+        return data.dayOfWeek !== undefined && data.timeOfDay !== undefined
+      }
+      return true
+    },
+    {
+      message: 'Biweekly schedules require dayOfWeek and timeOfDay',
       path: ['dayOfWeek'],
     }
   )
