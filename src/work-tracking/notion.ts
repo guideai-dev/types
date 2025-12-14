@@ -93,6 +93,19 @@ export interface NotionTeamMapping {
 }
 
 /**
+ * Configuration for a delivery link property mapping
+ * Maps a Notion property (relation or URL) to cross-tool issue links
+ */
+export interface NotionDeliveryLinkMapping {
+  /** Name of the Notion property */
+  notionProperty: string
+  /** Type of the property: 'relation' or 'url' */
+  notionPropertyType: 'relation' | 'url'
+  /** The type of link to create */
+  linkType: 'validates' | 'implements' | 'relates_to'
+}
+
+/**
  * Complete mapping configuration for a Notion database
  */
 export interface NotionMappingConfig {
@@ -114,6 +127,8 @@ export interface NotionMappingConfig {
   creator?: NotionPropertyMapping
   /** Optional: maps to Issue.assigneeUsername (people property) */
   assignee?: NotionPropertyMapping
+  /** Optional: maps Notion relation/URL properties to cross-tool issue links */
+  deliveryLinks?: NotionDeliveryLinkMapping[]
 }
 
 /**
