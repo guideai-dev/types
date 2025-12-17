@@ -269,3 +269,68 @@ export interface SurveyQuestionConfig {
   version: string
   questions: SurveyQuestion[]
 }
+
+// Question Override types (for tenant-level customization)
+export interface QuestionOverride {
+  text?: string
+  helpText?: string
+  required?: boolean
+  // Multiple choice answer customization (must match original choice count)
+  choices?: string[]
+  // Scale type conversion (only compatible conversions allowed)
+  type?: QuestionType
+  // Scale labels customization [min, max]
+  labels?: [string, string]
+}
+
+export interface QuestionOverrides {
+  version: string // Config version (e.g., "1.0")
+  overrides: Record<string, QuestionOverride> // keyed by question ID
+}
+
+// Scale conversion compatibility definitions
+export interface ScaleConversion {
+  from: QuestionType
+  to: QuestionType
+}
+
+/**
+ * Compatible scale type conversions.
+ * Only these conversions are allowed when overriding question types.
+ */
+export const COMPATIBLE_SCALE_CONVERSIONS: ScaleConversion[] = [
+  { from: 'likert-7', to: 'likert-5' },
+  { from: 'likert-5', to: 'likert-7' },
+  { from: 'likert-7', to: 'nps' },
+  { from: 'likert-5', to: 'nps' },
+  { from: 'nps', to: 'likert-7' },
+  { from: 'nps', to: 'likert-5' },
+  { from: 'number', to: 'likert-5' },
+  { from: 'number', to: 'likert-7' },
+  { from: 'likert-5', to: 'number' },
+  { from: 'likert-7', to: 'number' },
+]
+
+export const questionTypeSchema = z.enum([
+  'likert-7',
+  'likert-5',
+  'nps',
+  'text',
+  'choice',
+  'number',
+  'boolean',
+])
+
+export const questionOverrideSchema = z.object({
+  text: z.string().optional(),
+  helpText: z.string().optional(),
+  required: z.boolean().optional(),
+  choices: z.array(z.string()).optional(),
+  type: questionTypeSchema.optional(),
+  labels: z.tuple([z.string(), z.string()]).optional(),
+})
+
+export const questionOverridesSchema = z.object({
+  version: z.string(),
+  overrides: z.record(z.string(), questionOverrideSchema),
+})

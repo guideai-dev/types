@@ -104,6 +104,8 @@ export interface UserSettings {
   userId: string
   emailSurveyAssignments: boolean
   emailSurveyReminders: boolean
+  slackSurveyAssignments: boolean
+  slackSurveyReminders: boolean
   homeFocusPreference: HomeFocusPreference
   createdAt: Date
   updatedAt: Date
@@ -115,6 +117,8 @@ export interface UserSettings {
 export interface UserSettingsUpdate {
   emailSurveyAssignments?: boolean
   emailSurveyReminders?: boolean
+  slackSurveyAssignments?: boolean
+  slackSurveyReminders?: boolean
   homeFocusPreference?: HomeFocusPreference
 }
 
