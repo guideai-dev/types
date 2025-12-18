@@ -1,9 +1,9 @@
 /**
  * Configuration types for work tracking
- * Label mappings, environment mappings, webhook secrets
+ * Label mappings, environment mappings, status mappings, webhook secrets
  */
 
-import type { IssueType } from './issues.js'
+import type { IssueType, SubStatus } from './issues.js'
 import type { Provider } from './repositories.js'
 
 /**
@@ -74,6 +74,46 @@ export interface EnvironmentMappingInsert {
 export interface EnvironmentMappingUpdate {
   environmentPattern?: string
   isProduction?: 'true' | 'false'
+  repositoryId?: string | null
+  updatedAt?: Date
+}
+
+/**
+ * Status mapping
+ * Maps external provider statuses to internal sub-status categories
+ * Supports global defaults and project/repository-level overrides
+ */
+export interface StatusMapping {
+  id: string
+  tenantId: string
+  provider: Provider
+  externalStatus: string // Provider's status string
+  internalSubStatus: SubStatus
+  projectId: string | null // null = applies to all projects
+  repositoryId: string | null // null = applies to all repos
+  createdAt: Date
+  updatedAt: Date
+}
+
+/**
+ * Status mapping insert type
+ */
+export interface StatusMappingInsert {
+  tenantId: string
+  provider: Provider
+  externalStatus: string
+  internalSubStatus: SubStatus
+  projectId?: string | null
+  repositoryId?: string | null
+}
+
+/**
+ * Status mapping update type
+ */
+export interface StatusMappingUpdate {
+  externalStatus?: string
+  internalSubStatus?: SubStatus
+  projectId?: string | null
   repositoryId?: string | null
   updatedAt?: Date
 }

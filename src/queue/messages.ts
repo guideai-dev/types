@@ -26,3 +26,14 @@ export interface BillingUpdateMessage {
   username: string
   timestamp: string
 }
+
+/**
+ * GitHub sync queue message
+ * Triggers background GitHub synchronization
+ */
+export interface GitHubSyncMessage {
+  syncLogId: string
+  tenantId: string
+  historyDepth: '7_days' | '30_days' | '90_days' | 'all'
+  syncType: 'organisation' | 'full' | 'work_items'
+}

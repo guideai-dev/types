@@ -11,9 +11,50 @@ import type { Provider } from './repositories.js'
 export type IssueState = 'open' | 'closed' | 'in_progress'
 
 /**
+ * Issue sub-status (normalized fine-grained workflow state)
+ * Provides consistent sub-status tracking across all providers
+ */
+export type SubStatus =
+  | 'backlog' // Not started, not prioritized
+  | 'ready' // Ready to start, prioritized
+  | 'discovery' // Research/spike/design work
+  | 'delivery' // Active development
+  | 'review' // Code review, testing, QA
+  | 'blocked' // Waiting on external dependency
+  | 'parked' // Intentionally paused
+  | 'done' // Completed successfully
+  | 'canceled' // Closed without completion
+
+/**
+ * Sub-statuses that exclude issues from WIP (Work In Progress) counts
+ */
+export const WIP_EXCLUDED_STATUSES: SubStatus[] = [
+  'backlog',
+  'ready',
+  'blocked',
+  'parked',
+  'done',
+  'canceled',
+]
+
+/**
+ * Check if a sub-status excludes the issue from WIP counts
+ */
+export function isExcludedFromWip(subStatus: SubStatus): boolean {
+  return WIP_EXCLUDED_STATUSES.includes(subStatus)
+}
+
+/**
  * Issue type (internal categorization)
  */
-export type IssueType = 'feature' | 'bug' | 'chore' | 'discovery' | 'incident' | 'other'
+export type IssueType =
+  | 'feature'
+  | 'bug'
+  | 'chore'
+  | 'tech_debt'
+  | 'discovery'
+  | 'incident'
+  | 'other'
 
 /**
  * A state transition event with timestamp
@@ -51,6 +92,11 @@ export interface Issue {
   body: string | null
   state: IssueState
   type: IssueType | null
+  isBlocked: boolean
+  // Sub-status tracking
+  subStatus: SubStatus | null
+  nativeStatus: string | null
+  excludedFromWip: boolean
   url: string
   apiUrl: string | null
   authorId: string | null
@@ -63,6 +109,13 @@ export interface Issue {
   updatedAt: Date
   closedAt: Date | null
   firstResponseAt: Date | null
+  // Transition timestamps
+  readyAt: Date | null
+  discoveryStartedAt: Date | null
+  deliveryStartedAt: Date | null
+  reviewStartedAt: Date | null
+  blockedAt: Date | null
+  parkedAt: Date | null
   metadata: Record<string, unknown> | null // Labels, milestone, etc.
   lastSyncedAt: Date
 }
@@ -80,6 +133,11 @@ export interface IssueInsert {
   body?: string | null
   state: IssueState
   type?: IssueType | null
+  isBlocked?: boolean
+  // Sub-status tracking
+  subStatus?: SubStatus | null
+  nativeStatus?: string | null
+  excludedFromWip?: boolean
   url: string
   apiUrl?: string | null
   authorId?: string | null
@@ -92,6 +150,13 @@ export interface IssueInsert {
   updatedAt: Date
   closedAt?: Date | null
   firstResponseAt?: Date | null
+  // Transition timestamps
+  readyAt?: Date | null
+  discoveryStartedAt?: Date | null
+  deliveryStartedAt?: Date | null
+  reviewStartedAt?: Date | null
+  blockedAt?: Date | null
+  parkedAt?: Date | null
   metadata?: Record<string, unknown> | null
 }
 
@@ -103,6 +168,11 @@ export interface IssueUpdate {
   body?: string | null
   state?: IssueState
   type?: IssueType | null
+  isBlocked?: boolean
+  // Sub-status tracking
+  subStatus?: SubStatus | null
+  nativeStatus?: string | null
+  excludedFromWip?: boolean
   authorId?: string | null
   assigneeCount?: number
   commentCount?: number
@@ -110,6 +180,13 @@ export interface IssueUpdate {
   updatedAt?: Date
   closedAt?: Date | null
   firstResponseAt?: Date | null
+  // Transition timestamps
+  readyAt?: Date | null
+  discoveryStartedAt?: Date | null
+  deliveryStartedAt?: Date | null
+  reviewStartedAt?: Date | null
+  blockedAt?: Date | null
+  parkedAt?: Date | null
   metadata?: Record<string, unknown> | null
   lastSyncedAt?: Date
 }
@@ -128,6 +205,11 @@ export interface IssueResponse {
   body: string | null
   state: IssueState
   type: IssueType | null
+  isBlocked: boolean
+  // Sub-status tracking
+  subStatus: SubStatus | null
+  nativeStatus: string | null
+  excludedFromWip: boolean
   url: string
   apiUrl: string | null
   author: {
@@ -143,6 +225,13 @@ export interface IssueResponse {
   updatedAt: string
   closedAt: string | null
   firstResponseAt: string | null
+  // Transition timestamps
+  readyAt: string | null
+  discoveryStartedAt: string | null
+  deliveryStartedAt: string | null
+  reviewStartedAt: string | null
+  blockedAt: string | null
+  parkedAt: string | null
   leadTimeMs: number | null // Calculated: closedAt - createdAt
   cycleTimeMs: number | null // Calculated: closedAt - startedAt
   metadata: Record<string, unknown> | null
