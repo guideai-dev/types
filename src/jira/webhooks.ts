@@ -254,6 +254,10 @@ export interface JiraWebhookSettingsResponse {
     name: string // Site name
     avatarUrl: string
   }>
+  // Re-authentication fields (when token is expired/invalid)
+  needsReauth?: boolean // True if OAuth token expired and needs re-authentication
+  reauthUrl?: string // URL to redirect user for re-authentication
+  reauthMessage?: string // User-friendly message explaining why re-auth is needed
 }
 
 /**
