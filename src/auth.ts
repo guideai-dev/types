@@ -52,5 +52,6 @@ export interface SessionContext {
   }
   tenant?: {
     id: string
+    name?: string | null
   }
 }

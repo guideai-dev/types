@@ -9,6 +9,7 @@ export interface User {
   githubId: number | null
   username: string
   email: string
+  emailIsPlaceholder?: boolean
   name: string
   avatarUrl: string | null
   isGlobalAdmin?: boolean
@@ -37,6 +38,7 @@ export interface TeamMember {
   username: string
   name: string
   email: string
+  emailIsPlaceholder?: boolean
   avatarUrl?: string
   role: 'owner' | 'admin' | 'member' | 'support'
   joinedAt: string
