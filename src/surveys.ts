@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 // Schedule Types
-export type ScheduleType = 'weekly' | 'biweekly' | 'monthly' | 'triggered'
+export type ScheduleType = 'weekly' | 'biweekly' | 'monthly' | 'triggered' | 'manual'
 export type TargetType = 'organization' | 'teams' | 'individual'
 export type SurveyStatus = 'pending' | 'completed' | 'expired'
 
@@ -80,7 +80,7 @@ const surveyScheduleBaseSchema = z.object({
   purpose: z
     .enum(['discovery', 'delivery', 'whole_team', 'happiness', 'ai_effectiveness'])
     .optional(),
-  scheduleType: z.enum(['weekly', 'biweekly', 'monthly', 'triggered']),
+  scheduleType: z.enum(['weekly', 'biweekly', 'monthly', 'triggered', 'manual']),
   dayOfWeek: z.number().int().min(0).max(6).optional(), // 0=Sunday, 6=Saturday
   dayOfMonth: z.number().int().min(1).max(31).optional(), // Business day 1-31
   timeOfDay: z
@@ -207,14 +207,14 @@ export type TeamExperienceSurveyResponse = SurveyResponse
 // Survey Question Response (API format)
 export interface SurveyQuestionResponse {
   questionId: string
-  value: string | number | null
+  value: string | number | boolean | null
 }
 
 export const surveyResponseSchema = z.object({
   responses: z.array(
     z.object({
       questionId: z.string(),
-      value: z.union([z.string(), z.number(), z.null()]),
+      value: z.union([z.string(), z.number(), z.boolean(), z.null()]),
     })
   ),
   durationSeconds: z.number().optional(),

@@ -15,4 +15,8 @@ export type { GitHubManageInfo, GitHubAppNameResponse } from './github/app.js'
 export type { DeleteUserRequest, DeleteUserResponse } from './domain/users.js'
 
 // Queue message types moved to queue/messages.ts
-export type { SessionProcessingMessage, BillingUpdateMessage, GitHubSyncMessage } from './queue/messages.js'
+export type {
+  SessionProcessingMessage,
+  BillingUpdateMessage,
+  GitHubSyncMessage,
+} from './queue/messages.js'
