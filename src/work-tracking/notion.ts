@@ -4,6 +4,50 @@
  */
 
 /**
+ * SubStatus values for Notion (matches status-sub-status-inference.ts)
+ */
+export type NotionSubStatus =
+  | 'backlog'
+  | 'ready'
+  | 'discovery'
+  | 'delivery'
+  | 'review'
+  | 'blocked'
+  | 'parked'
+  | 'done'
+  | 'canceled'
+
+/**
+ * User relation types that can be mapped to Notion people properties
+ */
+export type NotionUserRelationType = 'author' | 'assignee' | 'commenter' | 'mentioned'
+
+/**
+ * User mapping configuration - maps a Notion people property to a relation type
+ */
+export interface NotionUserMapping {
+  /** Name of the Notion property (must be 'people' or 'created_by' type) */
+  notionProperty: string
+  /** Type of the Notion property */
+  notionPropertyType: 'people' | 'created_by'
+  /** The relation type to assign to users from this property */
+  relationType: NotionUserRelationType
+}
+
+/**
+ * SubStatus mapping configuration for Notion
+ * Maps Notion status/select values to internal subStatus values
+ */
+export interface NotionSubStatusMapping {
+  /** Name of the Notion property to read status from */
+  notionProperty: string
+  /** Type of the Notion property (must be 'status' or 'select') */
+  notionPropertyType: 'status' | 'select'
+  /** Maps Notion status values to internal subStatus values */
+  valueMappings: Record<string, NotionSubStatus>
+}
+
+/**
  * Notion workspace installation - one per tenant
  */
 export interface NotionInstallation {
@@ -113,8 +157,13 @@ export interface NotionMappingConfig {
   title: NotionPropertyMapping
   /** Optional: maps to Issue.body */
   body?: NotionPropertyMapping
-  /** Required for sync: maps to Issue.state (open/closed/in_progress) */
+  /**
+   * @deprecated Use subStatus instead. State is automatically derived from subStatus.
+   * Maps to Issue.state (open/closed/in_progress)
+   */
   state?: NotionPropertyMapping
+  /** Maps Notion status values to subStatus. State is automatically derived. */
+  subStatus?: NotionSubStatusMapping
   /** Required for sync: maps to Issue.type (feature/bug/chore/discovery/incident/other) */
   type?: NotionPropertyMapping
   /** Required for sync: maps to team assignment */
@@ -123,10 +172,18 @@ export interface NotionMappingConfig {
   createdAt?: NotionPropertyMapping
   /** Optional: maps to Issue.closedAt */
   closedAt?: NotionPropertyMapping
-  /** Optional: maps to Issue.authorUsername (people or created_by property) */
+  /**
+   * @deprecated Use userMappings instead for flexible user relation mapping.
+   * Maps to Issue.authorUsername (people or created_by property)
+   */
   creator?: NotionPropertyMapping
-  /** Optional: maps to Issue.assigneeUsername (people property) */
+  /**
+   * @deprecated Use userMappings instead for flexible user relation mapping.
+   * Maps to Issue.assigneeUsername (people property)
+   */
   assignee?: NotionPropertyMapping
+  /** Dynamic user mappings - maps Notion people properties to user relation types */
+  userMappings?: NotionUserMapping[]
   /** Optional: maps Notion relation/URL properties to cross-tool issue links */
   deliveryLinks?: NotionDeliveryLinkMapping[]
 }
