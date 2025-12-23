@@ -242,18 +242,35 @@ export interface JiraWebhookConfig {
 }
 
 /**
+ * Connected Jira site (tenant-level installation)
+ */
+export interface JiraConnectedSite {
+  id: string // Installation UUID
+  cloudId: string // Jira cloud ID (site identifier)
+  siteName: string // Site name (e.g., "Acme Corp")
+  siteUrl: string // Site URL (e.g., "https://acmecorp.atlassian.net")
+  isActive: boolean // Whether the installation is active (syncing enabled)
+  createdAt: Date // When the site was connected
+}
+
+/**
  * Jira webhook settings API response
  */
 export interface JiraWebhookSettingsResponse {
-  isConnected: boolean // OAuth connection status
-  hasAdminScopes: boolean // Whether user has manage:jira-webhook scope
+  isConnected: boolean // Tenant has at least one Jira site connected
+  hasAdminScopes: boolean // Whether CURRENT USER has manage:jira-webhook scope
   webhooks: JiraWebhookConfig[]
+  // Tenant-level connected sites (from jira_installations table)
+  connectedSites: JiraConnectedSite[]
+  // Sites accessible to the current user (only populated if userHasOAuth)
   accessibleResources: Array<{
     id: string // cloudId
     url: string // Site URL
     name: string // Site name
     avatarUrl: string
   }>
+  // Whether the current user has personal Jira OAuth connected
+  userHasOAuth: boolean
   // Re-authentication fields (when token is expired/invalid)
   needsReauth?: boolean // True if OAuth token expired and needs re-authentication
   reauthUrl?: string // URL to redirect user for re-authentication
