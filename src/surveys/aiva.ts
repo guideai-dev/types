@@ -1,0 +1,562 @@
+// AIVA Assessment Types v2
+// Inference-first model with role-based questions and composite scoring
+
+// =============================================================================
+// CORE ENUMS AND TYPES
+// =============================================================================
+
+/**
+ * Question types for engaging, inference-first assessment
+ * - scenario-choice: Real-world scenarios with 4 options mapping to maturity levels
+ * - frequency-scale: "How often does X happen?" with frequency-to-maturity mapping
+ * - evidence-checklist: Select evidence items present, score by tier
+ * - comparison-anchor: Compare org to described anchors (A/B/C/D)
+ */
+export type AIVAQuestionType =
+  | 'scenario-choice'
+  | 'frequency-scale'
+  | 'evidence-checklist'
+  | 'comparison-anchor'
+
+/**
+ * Respondent roles - each gets a tailored subset of questions
+ */
+export type AIVARespondentRole = 'leadership' | 'product' | 'engineering' | 'operations'
+
+/**
+ * Confidence levels based on evidence quality and source count
+ */
+export type AIVAConfidence = 'low' | 'medium' | 'high'
+
+/**
+ * Value Stream phases
+ */
+export type AIVAValueStreamPhase = 'discovery' | 'delivery' | 'validation' | 'foundations'
+
+/**
+ * Capability layers
+ */
+export type AIVACapabilityLayer =
+  | 'strategyAndCulture'
+  | 'peopleAndSkills'
+  | 'waysOfWorking'
+  | 'technicalPlatform'
+  | 'governanceAndEnablers'
+  | 'externalInterfaces'
+
+// =============================================================================
+// DIMENSION DEFINITIONS
+// =============================================================================
+
+/**
+ * All 34 dimensions organized by category
+ */
+export const AIVA_DIMENSIONS = {
+  valueStream: ['vsDiscovery', 'vsDelivery', 'vsValidation', 'vsFoundations'] as const,
+  strategyAndCulture: [
+    'capScLeadership',
+    'capScAiVision',
+    'capScExperimentation',
+    'capScLearning',
+    'capScChangeReadiness',
+  ] as const,
+  peopleAndSkills: [
+    'capPsAiFluency',
+    'capPsPromptEngineering',
+    'capPsGrowthFrameworks',
+    'capPsRoleEvolution',
+    'capPsTalentStrategy',
+  ] as const,
+  waysOfWorking: [
+    'capWowTeamTopology',
+    'capWowRituals',
+    'capWowDecisionMaking',
+    'capWowCrossFunctional',
+    'capWowPrioritization',
+  ] as const,
+  technicalPlatform: [
+    'capTpDesignSystem',
+    'capTpGoldenPaths',
+    'capTpCiCd',
+    'capTpAiTooling',
+    'capTpObservability',
+  ] as const,
+  governanceAndEnablers: [
+    'capGeCompliance',
+    'capGeSecurity',
+    'capGeCostManagement',
+    'capGeQualityGates',
+    'capGeDataGovernance',
+  ] as const,
+  externalInterfaces: [
+    'capEiStakeholderLiteracy',
+    'capEiCustomerValidation',
+    'capEiVendorAlignment',
+    'capEiRegulatory',
+    'capEiDependencyManagement',
+  ] as const,
+} as const
+
+export type AIVADimension =
+  | (typeof AIVA_DIMENSIONS.valueStream)[number]
+  | (typeof AIVA_DIMENSIONS.strategyAndCulture)[number]
+  | (typeof AIVA_DIMENSIONS.peopleAndSkills)[number]
+  | (typeof AIVA_DIMENSIONS.waysOfWorking)[number]
+  | (typeof AIVA_DIMENSIONS.technicalPlatform)[number]
+  | (typeof AIVA_DIMENSIONS.governanceAndEnablers)[number]
+  | (typeof AIVA_DIMENSIONS.externalInterfaces)[number]
+
+/**
+ * Get all dimension keys as a flat array
+ */
+export function getAllDimensions(): AIVADimension[] {
+  return [
+    ...AIVA_DIMENSIONS.valueStream,
+    ...AIVA_DIMENSIONS.strategyAndCulture,
+    ...AIVA_DIMENSIONS.peopleAndSkills,
+    ...AIVA_DIMENSIONS.waysOfWorking,
+    ...AIVA_DIMENSIONS.technicalPlatform,
+    ...AIVA_DIMENSIONS.governanceAndEnablers,
+    ...AIVA_DIMENSIONS.externalInterfaces,
+  ]
+}
+
+// =============================================================================
+// DIMENSION CONFIG TYPES (v2)
+// =============================================================================
+
+/**
+ * How a question contributes to a dimension's score
+ */
+export interface AIVADimensionContribution {
+  dimension: AIVADimension
+  weight: number // 0.0 to 1.0, how strongly this question affects the dimension
+}
+
+/**
+ * Entry in the dimension config for a single question
+ * Maps question ID to scoring/dimension information
+ */
+export interface AIVAQuestionDimensionEntry {
+  /** Original AIVA question type (for calibration logic reference) */
+  aivaType: 'scenario-choice' | 'frequency-scale' | 'evidence-checklist' | 'comparison-anchor'
+
+  /** Dimension contributions with weights */
+  contributes: AIVADimensionContribution[]
+
+  /** Role targeting (which roles see this question) */
+  roles: AIVARespondentRole[]
+
+  /** For evidence-checklist: scoring mode */
+  scoringMode?: 'highest-tier' | 'count-based'
+
+  /** For frequency-scale: custom frequency-to-score mapping */
+  frequencyMapping?: Record<string, number>
+
+  /** For evidence-checklist: tier assignments for each item index */
+  itemTiers?: number[]
+}
+
+/**
+ * Dimension mappings configuration
+ * Stores which questions contribute to which dimensions and how
+ */
+export interface AIVADimensionConfig {
+  version: string
+  questions: Record<string, AIVAQuestionDimensionEntry>
+}
+
+// =============================================================================
+// LEGACY QUESTION TYPES (DEPRECATED)
+// =============================================================================
+
+/**
+ * @deprecated Use standard SurveyQuestion with AIVADimensionConfig instead
+ * Base fields shared by all legacy question types
+ */
+interface AIVAQuestionBase {
+  id: string
+  text: string
+  helpText?: string
+  roles: AIVARespondentRole[] // Which roles see this question
+  contributes: AIVADimensionContribution[] // Which dimensions this affects
+}
+
+/**
+ * @deprecated Use standard SurveyQuestion with type: 'choice' instead
+ * Scenario-choice question: Present a scenario, user picks which matches their org
+ */
+export interface AIVAScenarioChoiceQuestion extends AIVAQuestionBase {
+  type: 'scenario-choice'
+  options: Array<{
+    id: string
+    text: string
+    maturityLevel: 1 | 2 | 3 | 4
+  }>
+}
+
+/**
+ * @deprecated Use standard SurveyQuestion with type: 'choice' instead
+ * Frequency-scale question: "How often does X happen?"
+ */
+export interface AIVAFrequencyScaleQuestion extends AIVAQuestionBase {
+  type: 'frequency-scale'
+  frequencyLabels: ['Never', 'Rarely', 'Sometimes', 'Often', 'Always']
+  frequencyMapping: {
+    Never: 1 | 2 | 3 | 4
+    Rarely: 1 | 2 | 3 | 4
+    Sometimes: 1 | 2 | 3 | 4
+    Often: 1 | 2 | 3 | 4
+    Always: 1 | 2 | 3 | 4
+  }
+}
+
+/**
+ * @deprecated Use standard SurveyQuestion with type: 'choice' and multiSelect: true instead
+ * Evidence-checklist question: Check all evidence items that apply
+ */
+export interface AIVAEvidenceChecklistQuestion extends AIVAQuestionBase {
+  type: 'evidence-checklist'
+  items: Array<{
+    id: string
+    text: string
+    tier: 1 | 2 | 3 | 4 // Which maturity level this evidence supports
+  }>
+  scoringMode: 'highest-tier' | 'count-based'
+  // highest-tier: score = highest tier among selected items
+  // count-based: score based on % of items selected (maps to 1-4)
+}
+
+/**
+ * @deprecated Use standard SurveyQuestion with type: 'choice' instead
+ * Comparison-anchor question: Compare your org to 4 described profiles
+ */
+export interface AIVAComparisonAnchorQuestion extends AIVAQuestionBase {
+  type: 'comparison-anchor'
+  anchors: {
+    A: { title: string; description: string; maturityLevel: 1 }
+    B: { title: string; description: string; maturityLevel: 2 }
+    C: { title: string; description: string; maturityLevel: 3 }
+    D: { title: string; description: string; maturityLevel: 4 }
+  }
+}
+
+/**
+ * @deprecated Use standard SurveyQuestion[] with AIVADimensionConfig instead
+ * Union of all legacy question types
+ */
+export type AIVAQuestion =
+  | AIVAScenarioChoiceQuestion
+  | AIVAFrequencyScaleQuestion
+  | AIVAEvidenceChecklistQuestion
+  | AIVAComparisonAnchorQuestion
+
+/**
+ * @deprecated Use SurveyQuestionConfig with AIVADimensionConfig instead
+ * Legacy question bank configuration
+ */
+export interface AIVAQuestionConfig {
+  version: string
+  questions: AIVAQuestion[]
+}
+
+// =============================================================================
+// RESPONSE TYPES
+// =============================================================================
+
+/**
+ * Response to a single question
+ */
+export interface AIVAQuestionResponse {
+  questionId: string
+  questionType: AIVAQuestionType
+  value: string | string[] // Single choice ID or array of checked IDs (for checklist)
+}
+
+/**
+ * Inferred score for a dimension
+ */
+export interface AIVAInferredScore {
+  score: number // 1-4 (can be decimal during aggregation, rounded for final)
+  confidence: AIVAConfidence
+  sources: string[] // Question IDs that contributed
+}
+
+/**
+ * Full response submission from a single respondent
+ */
+export interface AIVAResponseSubmission {
+  surveyInstanceId: string
+  role: AIVARespondentRole
+  responses: AIVAQuestionResponse[]
+  durationSeconds?: number
+}
+
+/**
+ * Stored response record (from aiva_responses table)
+ */
+export interface AIVAStoredResponse {
+  id: string
+  tenantId: string
+  surveyInstanceId: string
+  userId: string | null
+  respondentRole: AIVARespondentRole
+  responses: AIVAQuestionResponse[]
+  inferredScores: Record<AIVADimension, AIVAInferredScore> | null
+  startedAt: Date | null
+  completedAt: Date | null
+  durationSeconds: number | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+// =============================================================================
+// AGGREGATION TYPES
+// =============================================================================
+
+/**
+ * Distribution statistics for a dimension across all respondents
+ */
+export interface AIVAScoreDistribution {
+  min: number
+  max: number
+  mean: number
+  median: number
+  variance: number
+  responseCount: number
+  byRole: Record<AIVARespondentRole, number[]> // Scores per role
+}
+
+/**
+ * Aggregated scores before calibration
+ */
+export interface AIVAAggregatedScores {
+  dimensions: Record<AIVADimension, AIVAScoreDistribution>
+  participantCount: number
+  rolesRepresented: Record<AIVARespondentRole, number>
+}
+
+/**
+ * A calibration adjustment made by the scheduler
+ */
+export interface AIVACalibrationAdjustment {
+  dimension: AIVADimension
+  original: number // Aggregated mean
+  final: number // Calibrated score (1-4)
+  rationale: string // Required explanation
+}
+
+// =============================================================================
+// ASSESSMENT TYPES (FINALIZED)
+// =============================================================================
+
+/**
+ * Score with confidence for a single dimension
+ */
+export interface AIVADimensionScore {
+  score: number // 1-4
+  confidence: AIVAConfidence
+}
+
+/**
+ * Finalized AIVA assessment (from aiva_assessments table)
+ */
+export interface AIVAAssessment {
+  id: string
+  tenantId: string
+  scheduleId: string
+  calibratedBy: string | null
+  calibratedAt: Date | null
+  participantCount: number
+  rolesRepresented: Record<AIVARespondentRole, number>
+
+  // All 34 dimension scores
+  scores: Record<AIVADimension, AIVADimensionScore>
+
+  // Calibration trail
+  calibrationAdjustments: AIVACalibrationAdjustment[]
+
+  // Aggregation details for transparency
+  aggregationDetails: Record<AIVADimension, AIVAScoreDistribution>
+
+  createdAt: Date
+  updatedAt: Date
+}
+
+/**
+ * Assessment preview (before calibration)
+ */
+export interface AIVAAssessmentPreview {
+  scheduleId: string
+  participantCount: number
+  rolesRepresented: Record<AIVARespondentRole, number>
+  scores: Record<
+    AIVADimension,
+    {
+      mean: number
+      median: number
+      min: number
+      max: number
+      responseCount: number
+    }
+  >
+  completionRate: number // % of assigned instances completed
+}
+
+// =============================================================================
+// API TYPES
+// =============================================================================
+
+/**
+ * Request to finalize an assessment with calibration
+ */
+export interface AIVAFinalizeRequest {
+  adjustments: AIVACalibrationAdjustment[]
+}
+
+/**
+ * Response from questions endpoint
+ */
+export interface AIVAQuestionsResponse {
+  questions: AIVAQuestion[]
+  totalCount: number
+  roleCount: Record<AIVARespondentRole, number>
+}
+
+// =============================================================================
+// RECOMMENDATION ENGINE TYPES (preserved from v1)
+// =============================================================================
+
+/**
+ * Roadmap horizons for prioritized recommendations
+ * - H1: 0-3 months - Unblock Flow (fix primary bottleneck)
+ * - H2: 3-6 months - Enable Capabilities (address capability gaps)
+ * - H3: 6-9 months - Build Foundations (platform and governance)
+ * - H4: 9-12 months - Compound Acceleration (strategic investments)
+ */
+export type AIVARecommendationHorizon = 'H1' | 'H2' | 'H3' | 'H4'
+
+/**
+ * Effort level for implementing a recommendation
+ */
+export type AIVARecommendationEffort = 'low' | 'medium' | 'high'
+
+/**
+ * A single recommendation from the AIVA roadmap engine
+ */
+export interface AIVARecommendation {
+  id: string
+  horizon: AIVARecommendationHorizon
+  title: string
+  description: string
+  targetCapability?: AIVACapabilityLayer
+  targetPhase?: AIVAValueStreamPhase
+  dependencies: string[]
+  successMetrics: string[]
+  effort: AIVARecommendationEffort
+  rationale: string
+  priority?: number
+}
+
+/**
+ * A capability gap identified during assessment analysis
+ */
+export interface AIVACapabilityGap {
+  layer: AIVACapabilityLayer
+  dimension: string
+  score: number
+  evidence?: string
+}
+
+/**
+ * Full roadmap generated from an AIVA assessment
+ */
+export interface AIVARoadmap {
+  assessmentId: string
+  assessmentDate: string | null
+  primaryBottleneck: AIVAValueStreamPhase | null
+  recommendations: AIVARecommendation[]
+  summary: {
+    totalRecommendations: number
+    byHorizon: Record<AIVARecommendationHorizon, number>
+    byEffort: Record<AIVARecommendationEffort, number>
+  }
+}
+
+// =============================================================================
+// REPORT GENERATOR TYPES (preserved from v1)
+// =============================================================================
+
+/**
+ * Value stream analysis section of the report
+ */
+export interface AIVAValueStreamAnalysis {
+  scores: {
+    discovery: number | null
+    delivery: number | null
+    validation: number | null
+    foundations: number | null
+  }
+  averageScore: number | null
+  bottleneck: AIVAValueStreamPhase | null
+  analysis: string
+}
+
+/**
+ * Capability analysis section of the report
+ */
+export interface AIVACapabilityAnalysis {
+  byLayer: Record<
+    AIVACapabilityLayer,
+    {
+      averageScore: number | null
+      dimensions: Array<{ name: string; score: number | null }>
+    }
+  >
+  topGaps: AIVACapabilityGap[]
+  analysis: string
+}
+
+/**
+ * Synthesis connecting bottlenecks to gaps
+ */
+export interface AIVASynthesis {
+  bottleneckToGaps: string
+  keyInsight: string
+  priorityAreas: string[]
+}
+
+/**
+ * Full diagnostic report from an AIVA assessment
+ */
+export interface AIVADiagnosticReport {
+  metadata: {
+    generatedAt: string
+    assessmentId: string
+    assessmentDate: string | null
+    tenantName: string
+  }
+  executiveSummary: string
+  valueStreamAnalysis: AIVAValueStreamAnalysis
+  capabilityAnalysis: AIVACapabilityAnalysis
+  synthesis: AIVASynthesis
+  roadmap: AIVARecommendation[]
+}
+
+// =============================================================================
+// LEGACY COMPATIBILITY (for gradual migration)
+// =============================================================================
+
+/**
+ * @deprecated Use AIVADimensionScore instead
+ */
+export interface AIVAScore {
+  score: number
+  confidence: AIVAConfidence
+  evidence?: string
+}
+
+/**
+ * @deprecated Use AIVAAssessment instead
+ */
+export type AIVAAssessmentType = 'value_stream' | 'capability' | 'full'

@@ -46,6 +46,13 @@ export type SurveyPurpose =
   | 'whole_team'
   | 'happiness'
   | 'ai_effectiveness'
+  | 'aiva'
+
+// Survey Instance Metadata (for survey-type-specific data)
+export interface SurveyInstanceMetadata {
+  /** AIVA respondent role (only set for AIVA surveys) */
+  aivaRole?: 'leadership' | 'product' | 'engineering' | 'operations'
+}
 
 // Survey Schedule
 export interface SurveySchedule {
@@ -78,7 +85,7 @@ const surveyScheduleBaseSchema = z.object({
   description: z.string().optional(),
   surveyType: z.string().default('team_experience'),
   purpose: z
-    .enum(['discovery', 'delivery', 'whole_team', 'happiness', 'ai_effectiveness'])
+    .enum(['discovery', 'delivery', 'whole_team', 'happiness', 'ai_effectiveness', 'aiva'])
     .optional(),
   scheduleType: z.enum(['weekly', 'biweekly', 'monthly', 'triggered', 'manual']),
   dayOfWeek: z.number().int().min(0).max(6).optional(), // 0=Sunday, 6=Saturday
@@ -88,7 +95,7 @@ const surveyScheduleBaseSchema = z.object({
     .regex(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/)
     .optional(), // HH:MM 24-hour
   triggerConfig: triggerConfigSchema.optional(),
-  questionConfig: questionConfigSchema.optional(),
+  questionConfig: questionConfigSchema.nullable().optional(),
   randomizeQuestionOrder: z.boolean().default(true),
   textQuestionsAtEnd: z.boolean().default(true),
   targetType: z.enum(['organization', 'teams', 'individual']),
@@ -168,6 +175,7 @@ export interface SurveyInstance {
   completedAt?: Date | null
   createdAt: Date
   surveyResponseId?: string | null
+  metadata?: SurveyInstanceMetadata | null
 }
 
 // Survey Response
@@ -207,14 +215,21 @@ export type TeamExperienceSurveyResponse = SurveyResponse
 // Survey Question Response (API format)
 export interface SurveyQuestionResponse {
   questionId: string
-  value: string | number | boolean | null
+  value: string | number | boolean | string[] | number[] | null // Arrays for multiSelect questions
 }
 
 export const surveyResponseSchema = z.object({
   responses: z.array(
     z.object({
       questionId: z.string(),
-      value: z.union([z.string(), z.number(), z.boolean(), z.null()]),
+      value: z.union([
+        z.string(),
+        z.number(),
+        z.boolean(),
+        z.array(z.string()),
+        z.array(z.number()),
+        z.null(),
+      ]),
     })
   ),
   durationSeconds: z.number().optional(),
@@ -260,9 +275,17 @@ export interface SurveyQuestion {
   skipLabel?: string // Optional custom label for skip button (e.g., "Skip this question")
   min?: number // For number type
   max?: number // For number type
+  multiSelect?: boolean // For multi-select choice questions (e.g., AIVA evidence checklists)
   // Optional fields for compatibility with AssessmentQuestionConfig
   importance?: 'low' | 'medium' | 'high'
   version?: string[]
+  // AIVA-specific fields (embedded from dimension config)
+  roles?: ('leadership' | 'product' | 'engineering' | 'operations')[]
+  dimensionContributions?: Array<{ dimension: string; weight: number }>
+  aivaType?: 'scenario-choice' | 'frequency-scale' | 'evidence-checklist' | 'comparison-anchor'
+  scoringMode?: 'highest-tier' | 'count-based'
+  frequencyMapping?: Record<number, number>
+  itemTiers?: Array<{ indices: number[]; score: number }>
 }
 
 export interface SurveyQuestionConfig {

@@ -46,6 +46,9 @@ export * from './git.js'
 export * from './processor.js'
 export * from './surveys.js'
 
+// AIVA assessment types
+export * from './surveys/aiva.js'
+
 // Canonical validation (Zod schemas and validation functions)
 export * from './canonical-validation.js'
 
