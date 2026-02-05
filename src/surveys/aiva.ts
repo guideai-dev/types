@@ -11,12 +11,14 @@
  * - frequency-scale: "How often does X happen?" with frequency-to-maturity mapping
  * - evidence-checklist: Select evidence items present, score by tier
  * - comparison-anchor: Compare org to described anchors (A/B/C/D)
+ * - open-feedback: Open-ended text question for additional feedback
  */
 export type AIVAQuestionType =
   | 'scenario-choice'
   | 'frequency-scale'
   | 'evidence-checklist'
   | 'comparison-anchor'
+  | 'open-feedback'
 
 /**
  * Respondent roles - each gets a tailored subset of questions
@@ -139,7 +141,7 @@ export interface AIVADimensionContribution {
  */
 export interface AIVAQuestionDimensionEntry {
   /** Original AIVA question type (for calibration logic reference) */
-  aivaType: 'scenario-choice' | 'frequency-scale' | 'evidence-checklist' | 'comparison-anchor'
+  aivaType: 'scenario-choice' | 'frequency-scale' | 'evidence-checklist' | 'comparison-anchor' | 'open-feedback'
 
   /** Dimension contributions with weights */
   contributes: AIVADimensionContribution[]

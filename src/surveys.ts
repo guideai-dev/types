@@ -329,7 +329,7 @@ export interface SurveyQuestion {
   // AIVA-specific fields (embedded from dimension config)
   roles?: ('leadership' | 'product' | 'engineering' | 'operations')[]
   dimensionContributions?: Array<{ dimension: string; weight: number }>
-  aivaType?: 'scenario-choice' | 'frequency-scale' | 'evidence-checklist' | 'comparison-anchor'
+  aivaType?: 'scenario-choice' | 'frequency-scale' | 'evidence-checklist' | 'comparison-anchor' | 'open-feedback'
   scoringMode?: 'highest-tier' | 'count-based'
   frequencyMapping?: Record<string, number> // Maps choice ID to score
   itemTiers?: Record<string, number> // Maps choice ID to tier score
