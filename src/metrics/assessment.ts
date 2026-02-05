@@ -1,3 +1,4 @@
+import type { SurveyChoice } from '../surveys.js'
 import type { BaseMetrics } from './types.js'
 
 // Assessment system types
@@ -102,7 +103,7 @@ export interface AssessmentQuestionConfig {
   required: boolean
   skipLabel?: string
   labels?: [string, string] // [min label, max label] for Likert scales
-  choices?: string[] // For choice questions
+  choices?: SurveyChoice[] // For choice questions (with stable IDs)
   placeholder?: string // For text questions
   helpText?: string
   reverseScored?: boolean // For Likert scales: true if low scores are positive (e.g., "Never" = good)

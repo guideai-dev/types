@@ -1,5 +1,52 @@
 import { z } from 'zod'
 
+// =============================================================================
+// SURVEY CHOICE TYPE
+// =============================================================================
+
+/**
+ * A choice option for survey questions with a stable ID.
+ * The ID remains constant even if the display text is updated.
+ */
+export interface SurveyChoice {
+  /** Stable identifier (e.g., "never", "reactive", "level_1") */
+  id: string
+  /** Display text shown to respondents */
+  text: string
+}
+
+export const surveyChoiceSchema = z.object({
+  id: z.string(),
+  text: z.string(),
+})
+
+/**
+ * Get the display text for a choice value.
+ * Handles both new ID-based values (string) and legacy index-based values (number).
+ *
+ * @param choices - Array of SurveyChoice objects
+ * @param value - The response value (choice ID or legacy index)
+ * @returns The display text, or undefined if not found
+ */
+export function getChoiceText(
+  choices: SurveyChoice[] | undefined,
+  value: string | number
+): string | undefined {
+  if (!choices || choices.length === 0) return undefined
+
+  // New format: ID lookup (string value)
+  if (typeof value === 'string') {
+    return choices.find(c => c.id === value)?.text
+  }
+
+  // Legacy format: Index lookup (for historical data display only)
+  if (typeof value === 'number' && value >= 0 && value < choices.length) {
+    return choices[value]?.text
+  }
+
+  return undefined
+}
+
 // Schedule Types
 export type ScheduleType = 'weekly' | 'biweekly' | 'monthly' | 'triggered' | 'manual'
 export type TargetType = 'organization' | 'teams' | 'individual'
@@ -268,7 +315,7 @@ export interface SurveyQuestion {
   category: QuestionCategory
   required: boolean
   labels?: [string, string] // [min, max] for scales / [no, yes] for boolean
-  choices?: string[]
+  choices?: SurveyChoice[] // Array of choice objects with stable IDs
   placeholder?: string
   helpText?: string
   reverseScored?: boolean
@@ -284,8 +331,8 @@ export interface SurveyQuestion {
   dimensionContributions?: Array<{ dimension: string; weight: number }>
   aivaType?: 'scenario-choice' | 'frequency-scale' | 'evidence-checklist' | 'comparison-anchor'
   scoringMode?: 'highest-tier' | 'count-based'
-  frequencyMapping?: Record<number, number>
-  itemTiers?: Array<{ indices: number[]; score: number }>
+  frequencyMapping?: Record<string, number> // Maps choice ID to score
+  itemTiers?: Record<string, number> // Maps choice ID to tier score
 }
 
 export interface SurveyQuestionConfig {
@@ -299,7 +346,7 @@ export interface QuestionOverride {
   helpText?: string
   required?: boolean
   // Multiple choice answer customization (must match original choice count)
-  choices?: string[]
+  choices?: SurveyChoice[]
   // Scale type conversion (only compatible conversions allowed)
   type?: QuestionType
   // Scale labels customization [min, max]
@@ -348,7 +395,7 @@ export const questionOverrideSchema = z.object({
   text: z.string().optional(),
   helpText: z.string().optional(),
   required: z.boolean().optional(),
-  choices: z.array(z.string()).optional(),
+  choices: z.array(surveyChoiceSchema).optional(),
   type: questionTypeSchema.optional(),
   labels: z.tuple([z.string(), z.string()]).optional(),
 })

@@ -150,10 +150,21 @@ export interface AIVAQuestionDimensionEntry {
   /** For evidence-checklist: scoring mode */
   scoringMode?: 'highest-tier' | 'count-based'
 
-  /** For frequency-scale: custom frequency-to-score mapping */
-  frequencyMapping?: Record<string, number>
+  /**
+   * ID-based score mappings.
+   * Maps choice IDs to their score values.
+   * Required for all AIVA questions.
+   *
+   * For scenario-choice/comparison-anchor: e.g., { "level_1": 1, "level_2": 2, "level_3": 3, "level_4": 4 }
+   * For frequency-scale: e.g., { "never": 1, "rarely": 2, "sometimes": 3, "often": 4, "always": 4 }
+   * For evidence-checklist: e.g., { "ci_pipeline": 2, "cd_pipeline": 2, "feature_flags": 3 }
+   */
+  choiceScoreMapping: Record<string, number>
 
-  /** For evidence-checklist: tier assignments for each item index */
+  // Legacy index-based mappings (deprecated, kept for backward compatibility during migration)
+  /** @deprecated Use choiceScoreMapping instead */
+  frequencyMapping?: Record<string, number>
+  /** @deprecated Use choiceScoreMapping instead */
   itemTiers?: number[]
 }
 
