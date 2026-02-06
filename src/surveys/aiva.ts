@@ -150,7 +150,7 @@ export interface AIVAQuestionDimensionEntry {
   roles: AIVARespondentRole[]
 
   /** For evidence-checklist: scoring mode */
-  scoringMode?: 'highest-tier' | 'count-based'
+  scoringMode?: 'highest-tier' | 'count-based' | 'cumulative'
 
   /**
    * ID-based score mappings.
@@ -554,6 +554,36 @@ export interface AIVADiagnosticReport {
   capabilityAnalysis: AIVACapabilityAnalysis
   synthesis: AIVASynthesis
   roadmap: AIVARecommendation[]
+}
+
+// =============================================================================
+// AI FEEDBACK SUMMARY TYPES
+// =============================================================================
+
+/**
+ * AI-generated summary for a single dimension's feedback
+ */
+export interface AIVADimensionFeedbackSummary {
+  dimensionKey: AIVADimension
+  summary: string // 2-3 sentence summary
+  sentiment: 'positive' | 'mixed' | 'negative' | 'neutral'
+  keyThemes: string[] // 2-4 bullet themes
+}
+
+/**
+ * AI-generated feedback summaries for an assessment
+ */
+export interface AIVAFeedbackSummaries {
+  executiveSummary: {
+    overview: string // 2-3 sentence high-level summary
+    startDoing: string[] // 3-5 concrete actions
+    stopDoing: string[] // 2-4 items (only if clearly supported)
+    majorThemes: string[] // 3-5 cross-cutting themes
+  }
+  dimensionSummaries: AIVADimensionFeedbackSummary[]
+  generatedAt: string // ISO timestamp
+  model: string // AI model used
+  feedbackCount: number // Total responses summarized
 }
 
 // =============================================================================
