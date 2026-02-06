@@ -338,6 +338,9 @@ export interface AIVAScoreDistribution {
   variance: number
   responseCount: number
   byRole: Record<AIVARespondentRole, number[]> // Scores per role
+  roleMeans: Record<AIVARespondentRole, number | null>
+  roleNormalizedMean: number | null
+  sampleWeightedMean: number | null
 }
 
 /**
@@ -411,6 +414,9 @@ export interface AIVAAssessmentPreview {
       min: number
       max: number
       responseCount: number
+      roleNormalizedMean: number | null
+      sampleWeightedMean: number | null
+      roleMeans: Record<AIVARespondentRole, number | null>
     }
   >
   completionRate: number // % of assigned instances completed
