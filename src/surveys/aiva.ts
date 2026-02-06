@@ -51,10 +51,48 @@ export type AIVACapabilityLayer =
 // =============================================================================
 
 /**
- * All 34 dimensions organized by category
+ * All dimensions organized by category.
+ *
+ * Value Stream has two levels:
+ * - Parent phases (vsDiscovery, etc.) are COMPUTED as averages of sub-dimensions
+ * - Sub-dimensions (vsDiscoveryResearch, etc.) are SCORED by questions
+ *
+ * Capabilities remain unchanged (30 dimensions across 6 layers).
+ *
+ * Total scored dimensions: 16 VS sub-dimensions + 30 capability = 46
+ * Total computed dimensions: 4 VS parent phases
  */
 export const AIVA_DIMENSIONS = {
+  // Parent VS phases - COMPUTED as averages of sub-dimensions, not directly scored
   valueStream: ['vsDiscovery', 'vsDelivery', 'vsValidation', 'vsFoundations'] as const,
+
+  // VS Sub-dimensions - SCORED by questions (4 per phase = 16 total)
+  discovery: [
+    'vsDiscoveryResearch',
+    'vsDiscoveryClarity',
+    'vsDiscoveryPrioritization',
+    'vsDiscoveryCollaboration',
+  ] as const,
+  delivery: [
+    'vsDeliveryVelocity',
+    'vsDeliveryQuality',
+    'vsDeliveryRelease',
+    'vsDeliveryFlow',
+  ] as const,
+  validation: [
+    'vsValidationFeedback',
+    'vsValidationExperimentation',
+    'vsValidationDecisions',
+    'vsValidationMetrics',
+  ] as const,
+  foundations: [
+    'vsFoundationsDx',
+    'vsFoundationsKnowledge',
+    'vsFoundationsObservability',
+    'vsFoundationsGovernance',
+  ] as const,
+
+  // Capability dimensions - unchanged (6 layers x 5 = 30)
   strategyAndCulture: [
     'capScLeadership',
     'capScAiVision',
@@ -99,8 +137,21 @@ export const AIVA_DIMENSIONS = {
   ] as const,
 } as const
 
+/**
+ * Value Stream sub-dimension types
+ */
+export type AIVAValueStreamSubDimension =
+  | (typeof AIVA_DIMENSIONS.discovery)[number]
+  | (typeof AIVA_DIMENSIONS.delivery)[number]
+  | (typeof AIVA_DIMENSIONS.validation)[number]
+  | (typeof AIVA_DIMENSIONS.foundations)[number]
+
+/**
+ * All dimension types including parent VS phases, VS sub-dimensions, and capabilities
+ */
 export type AIVADimension =
   | (typeof AIVA_DIMENSIONS.valueStream)[number]
+  | AIVAValueStreamSubDimension
   | (typeof AIVA_DIMENSIONS.strategyAndCulture)[number]
   | (typeof AIVA_DIMENSIONS.peopleAndSkills)[number]
   | (typeof AIVA_DIMENSIONS.waysOfWorking)[number]
@@ -109,11 +160,105 @@ export type AIVADimension =
   | (typeof AIVA_DIMENSIONS.externalInterfaces)[number]
 
 /**
- * Get all dimension keys as a flat array
+ * Mapping from parent VS phase to its sub-dimensions
+ */
+export const VS_PHASE_SUB_DIMENSIONS: Record<
+  AIVAValueStreamPhase,
+  readonly AIVAValueStreamSubDimension[]
+> = {
+  discovery: AIVA_DIMENSIONS.discovery,
+  delivery: AIVA_DIMENSIONS.delivery,
+  validation: AIVA_DIMENSIONS.validation,
+  foundations: AIVA_DIMENSIONS.foundations,
+}
+
+/**
+ * Human-readable names for VS sub-dimensions
+ */
+export const VS_SUB_DIMENSION_NAMES: Record<AIVAValueStreamSubDimension, string> = {
+  vsDiscoveryResearch: 'Research & Insights',
+  vsDiscoveryClarity: 'Problem Definition',
+  vsDiscoveryPrioritization: 'Prioritization',
+  vsDiscoveryCollaboration: 'Cross-functional Discovery',
+  vsDeliveryVelocity: 'Development Speed',
+  vsDeliveryQuality: 'Quality & Review',
+  vsDeliveryRelease: 'Release Capability',
+  vsDeliveryFlow: 'Flow Efficiency',
+  vsValidationFeedback: 'Feedback Loops',
+  vsValidationExperimentation: 'Experimentation',
+  vsValidationDecisions: 'Evidence-based Decisions',
+  vsValidationMetrics: 'Outcome Measurement',
+  vsFoundationsDx: 'Developer Experience',
+  vsFoundationsKnowledge: 'Knowledge & Onboarding',
+  vsFoundationsObservability: 'Observability & Reliability',
+  vsFoundationsGovernance: 'Enabling Governance',
+}
+
+/**
+ * Get the parent VS phase for a sub-dimension
+ */
+export function getParentPhase(subDim: AIVAValueStreamSubDimension): AIVAValueStreamPhase {
+  if (AIVA_DIMENSIONS.discovery.includes(subDim as (typeof AIVA_DIMENSIONS.discovery)[number]))
+    return 'discovery'
+  if (AIVA_DIMENSIONS.delivery.includes(subDim as (typeof AIVA_DIMENSIONS.delivery)[number]))
+    return 'delivery'
+  if (AIVA_DIMENSIONS.validation.includes(subDim as (typeof AIVA_DIMENSIONS.validation)[number]))
+    return 'validation'
+  return 'foundations'
+}
+
+/**
+ * Check if a dimension is a VS sub-dimension (scored) vs parent phase (computed)
+ */
+export function isVsSubDimension(dim: AIVADimension): dim is AIVAValueStreamSubDimension {
+  return (
+    (AIVA_DIMENSIONS.discovery as readonly string[]).includes(dim) ||
+    (AIVA_DIMENSIONS.delivery as readonly string[]).includes(dim) ||
+    (AIVA_DIMENSIONS.validation as readonly string[]).includes(dim) ||
+    (AIVA_DIMENSIONS.foundations as readonly string[]).includes(dim)
+  )
+}
+
+/**
+ * Check if a dimension is a computed parent VS phase
+ */
+export function isVsParentPhase(
+  dim: AIVADimension
+): dim is (typeof AIVA_DIMENSIONS.valueStream)[number] {
+  return (AIVA_DIMENSIONS.valueStream as readonly string[]).includes(dim)
+}
+
+/**
+ * Get all scored dimensions (VS sub-dimensions + capabilities).
+ * These are the dimensions that questions contribute to directly.
+ * Parent VS phases are excluded as they are computed from sub-dimensions.
+ */
+export function getAllScoredDimensions(): AIVADimension[] {
+  return [
+    ...AIVA_DIMENSIONS.discovery,
+    ...AIVA_DIMENSIONS.delivery,
+    ...AIVA_DIMENSIONS.validation,
+    ...AIVA_DIMENSIONS.foundations,
+    ...AIVA_DIMENSIONS.strategyAndCulture,
+    ...AIVA_DIMENSIONS.peopleAndSkills,
+    ...AIVA_DIMENSIONS.waysOfWorking,
+    ...AIVA_DIMENSIONS.technicalPlatform,
+    ...AIVA_DIMENSIONS.governanceAndEnablers,
+    ...AIVA_DIMENSIONS.externalInterfaces,
+  ]
+}
+
+/**
+ * Get all dimension keys as a flat array (includes parent VS phases, sub-dims, and capabilities).
+ * For scored-only dimensions, use getAllScoredDimensions() instead.
  */
 export function getAllDimensions(): AIVADimension[] {
   return [
     ...AIVA_DIMENSIONS.valueStream,
+    ...AIVA_DIMENSIONS.discovery,
+    ...AIVA_DIMENSIONS.delivery,
+    ...AIVA_DIMENSIONS.validation,
+    ...AIVA_DIMENSIONS.foundations,
     ...AIVA_DIMENSIONS.strategyAndCulture,
     ...AIVA_DIMENSIONS.peopleAndSkills,
     ...AIVA_DIMENSIONS.waysOfWorking,
@@ -470,6 +615,7 @@ export interface AIVARecommendation {
   description: string
   targetCapability?: AIVACapabilityLayer
   targetPhase?: AIVAValueStreamPhase
+  targetSubDimension?: AIVAValueStreamSubDimension
   dependencies: string[]
   successMetrics: string[]
   effort: AIVARecommendationEffort
@@ -516,6 +662,7 @@ export interface AIVAValueStreamAnalysis {
     validation: number | null
     foundations: number | null
   }
+  subDimensionScores?: Partial<Record<AIVAValueStreamSubDimension, number | null>>
   averageScore: number | null
   bottleneck: AIVAValueStreamPhase | null
   analysis: string
