@@ -562,6 +562,8 @@ export interface AIVAAssessmentPreview {
       roleNormalizedMean: number | null
       sampleWeightedMean: number | null
       roleMeans: Record<AIVARespondentRole, number | null>
+      variance: number
+      byRole: Record<AIVARespondentRole, number[]>
     }
   >
   completionRate: number // % of assigned instances completed
@@ -646,6 +648,21 @@ export interface AIVARoadmap {
     byHorizon: Record<AIVARecommendationHorizon, number>
     byEffort: Record<AIVARecommendationEffort, number>
   }
+  executiveSummary?: string
+  source?: 'ai' | 'template'
+  generatedAt?: string
+}
+
+/**
+ * AI-generated roadmap stored alongside the assessment
+ */
+export interface AIVAGeneratedRoadmap {
+  recommendations: AIVARecommendation[]
+  executiveSummary: string
+  primaryBottleneck: AIVAValueStreamPhase | null
+  generatedAt: string
+  model: string
+  source: 'ai' | 'template'
 }
 
 // =============================================================================
