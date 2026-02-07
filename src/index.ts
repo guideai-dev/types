@@ -1,4 +1,4 @@
-// Re-export all types from organized sub-modules
+// Re-export all types from organised sub-modules
 
 // Domain types
 export * from './domain/users.js'

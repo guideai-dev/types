@@ -51,7 +51,7 @@ export type AIVACapabilityLayer =
 // =============================================================================
 
 /**
- * All dimensions organized by category.
+ * All dimensions organised by category.
  *
  * Value Stream has two levels:
  * - Parent phases (vsDiscovery, etc.) are COMPUTED as averages of sub-dimensions
@@ -178,7 +178,7 @@ export const VS_PHASE_SUB_DIMENSIONS: Record<
 export const VS_SUB_DIMENSION_NAMES: Record<AIVAValueStreamSubDimension, string> = {
   vsDiscoveryResearch: 'Research & Insights',
   vsDiscoveryClarity: 'Problem Definition',
-  vsDiscoveryPrioritization: 'Prioritization',
+  vsDiscoveryPrioritization: 'Prioritisation',
   vsDiscoveryCollaboration: 'Cross-functional Discovery',
   vsDeliveryVelocity: 'Development Speed',
   vsDeliveryQuality: 'Quality & Review',
@@ -594,7 +594,7 @@ export interface AIVAQuestionsResponse {
 // =============================================================================
 
 /**
- * Roadmap horizons for prioritized recommendations
+ * Roadmap horizons for prioritised recommendations
  * - H1: 0-3 months - Unblock Flow (fix primary bottleneck)
  * - H2: 3-6 months - Enable Capabilities (address capability gaps)
  * - H3: 6-9 months - Build Foundations (platform and governance)
@@ -753,7 +753,7 @@ export interface AIVAFeedbackSummaries {
   dimensionSummaries: AIVADimensionFeedbackSummary[]
   generatedAt: string // ISO timestamp
   model: string // AI model used
-  feedbackCount: number // Total responses summarized
+  feedbackCount: number // Total responses summarised
 }
 
 // =============================================================================
@@ -789,7 +789,7 @@ export const AIVA_DIMENSION_NAMES: Record<AIVADimension, string> = {
   capWowRituals: 'Rituals & Ceremonies',
   capWowDecisionMaking: 'Decision Making',
   capWowCrossFunctional: 'Cross-Functional Collaboration',
-  capWowPrioritization: 'Prioritization',
+  capWowPrioritization: 'Prioritisation',
   capTpDesignSystem: 'Design System',
   capTpGoldenPaths: 'Golden Paths',
   capTpCiCd: 'CI/CD Pipeline',

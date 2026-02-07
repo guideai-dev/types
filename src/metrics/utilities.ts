@@ -1,5 +1,5 @@
 // Metric Calculation Helper Utilities
-// Type-safe helper functions for extracting and analyzing content from sessions
+// Type-safe helper functions for extracting and analysing content from sessions
 
 import type { TextContent, ToolResultContent, ToolUseContent } from '../providers/shared/index.js'
 import {

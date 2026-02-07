@@ -15,8 +15,8 @@ export type IssueState = 'open' | 'closed' | 'in_progress'
  * Provides consistent sub-status tracking across all providers
  */
 export type SubStatus =
-  | 'backlog' // Not started, not prioritized
-  | 'ready' // Ready to start, prioritized
+  | 'backlog' // Not started, not prioritised
+  | 'ready' // Ready to start, prioritised
   | 'discovery' // Research/spike/design work
   | 'delivery' // Active development
   | 'review' // Code review, testing, QA
