@@ -19,6 +19,10 @@ export type Subjects =
   | 'Team' // Teams
   | 'Repository' // Repositories
   | 'TeamTarget' // Team metric targets
+  // Granular management
+  | 'Integration' // Provider integrations (connect/sync/config)
+  | 'Dashboard' // Dashboard CRUD
+  | 'WorkTracking' // Label/status/env mappings, work tracking config
   // Subscriber features (subscription-based access)
   | 'AdvancedAnalytics' // Advanced analytics features
   | 'UnlimitedSessions' // Unlimited session storage

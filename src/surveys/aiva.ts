@@ -760,6 +760,124 @@ export interface AIVAFeedbackSummaries {
 // LEGACY COMPATIBILITY (for gradual migration)
 // =============================================================================
 
+// =============================================================================
+// DISPLAY NAME CONSTANTS
+// =============================================================================
+
+/**
+ * Complete map of all dimension keys to display labels.
+ * Combines VS parent phases + VS sub-dimensions + capability dimensions.
+ * This is the canonical source of truth for all dimension display names.
+ */
+export const AIVA_DIMENSION_NAMES: Record<AIVADimension, string> = {
+  vsDiscovery: 'Discovery',
+  vsDelivery: 'Delivery',
+  vsValidation: 'Validation',
+  vsFoundations: 'Foundations',
+  ...VS_SUB_DIMENSION_NAMES,
+  capScLeadership: 'Leadership Commitment',
+  capScAiVision: 'AI Vision',
+  capScExperimentation: 'Experimentation Culture',
+  capScLearning: 'Continuous Learning',
+  capScChangeReadiness: 'Change Readiness',
+  capPsAiFluency: 'AI Fluency',
+  capPsPromptEngineering: 'Prompt Engineering',
+  capPsGrowthFrameworks: 'Growth Frameworks',
+  capPsRoleEvolution: 'Role Evolution',
+  capPsTalentStrategy: 'Talent Strategy',
+  capWowTeamTopology: 'Team Topology',
+  capWowRituals: 'Rituals & Ceremonies',
+  capWowDecisionMaking: 'Decision Making',
+  capWowCrossFunctional: 'Cross-Functional Collaboration',
+  capWowPrioritization: 'Prioritization',
+  capTpDesignSystem: 'Design System',
+  capTpGoldenPaths: 'Golden Paths',
+  capTpCiCd: 'CI/CD Pipeline',
+  capTpAiTooling: 'AI Tooling',
+  capTpObservability: 'Observability',
+  capGeCompliance: 'Compliance',
+  capGeSecurity: 'Security',
+  capGeCostManagement: 'Cost Management',
+  capGeQualityGates: 'Quality Gates',
+  capGeDataGovernance: 'Data Governance',
+  capEiStakeholderLiteracy: 'Stakeholder AI Literacy',
+  capEiCustomerValidation: 'Customer Validation',
+  capEiVendorAlignment: 'Vendor Alignment',
+  capEiRegulatory: 'Regulatory Awareness',
+  capEiDependencyManagement: 'Dependency Management',
+}
+
+/**
+ * Full display names for capability layers
+ */
+export const AIVA_CAPABILITY_LAYER_NAMES: Record<AIVACapabilityLayer, string> = {
+  strategyAndCulture: 'Strategy & Culture',
+  peopleAndSkills: 'People & Skills',
+  waysOfWorking: 'Ways of Working',
+  technicalPlatform: 'Platform',
+  governanceAndEnablers: 'Governance & Enablers',
+  externalInterfaces: 'External Interfaces',
+}
+
+/**
+ * Compact display names for capability layers (for charts/badges)
+ */
+export const AIVA_CAPABILITY_LAYER_SHORT_NAMES: Record<AIVACapabilityLayer, string> = {
+  strategyAndCulture: 'Strategy & Culture',
+  peopleAndSkills: 'People & Skills',
+  waysOfWorking: 'Ways of Working',
+  technicalPlatform: 'Platform',
+  governanceAndEnablers: 'Governance',
+  externalInterfaces: 'External',
+}
+
+/**
+ * Display names for value stream phases
+ */
+export const AIVA_VALUE_STREAM_PHASE_NAMES: Record<AIVAValueStreamPhase, string> = {
+  discovery: 'Discovery',
+  delivery: 'Delivery',
+  validation: 'Validation',
+  foundations: 'Foundations',
+}
+
+/**
+ * Display labels for respondent roles
+ */
+export const AIVA_ROLE_LABELS: Record<AIVARespondentRole, string> = {
+  leadership: 'Leadership',
+  product: 'Product',
+  engineering: 'Engineering',
+  operations: 'Operations',
+}
+
+/**
+ * Maps each capability layer to its dimension keys (derived from AIVA_DIMENSIONS)
+ */
+export const AIVA_CAPABILITY_DIMENSION_KEYS: Record<AIVACapabilityLayer, readonly AIVADimension[]> =
+  {
+    strategyAndCulture: AIVA_DIMENSIONS.strategyAndCulture,
+    peopleAndSkills: AIVA_DIMENSIONS.peopleAndSkills,
+    waysOfWorking: AIVA_DIMENSIONS.waysOfWorking,
+    technicalPlatform: AIVA_DIMENSIONS.technicalPlatform,
+    governanceAndEnablers: AIVA_DIMENSIONS.governanceAndEnablers,
+    externalInterfaces: AIVA_DIMENSIONS.externalInterfaces,
+  }
+
+/**
+ * Maps each VS phase to its parent dimension key
+ */
+export const AIVA_VS_PHASE_DIMENSION_KEYS: Record<AIVAValueStreamPhase, AIVADimension> = {
+  discovery: 'vsDiscovery',
+  delivery: 'vsDelivery',
+  validation: 'vsValidation',
+  foundations: 'vsFoundations',
+}
+
+// =============================================================================
+// LEGACY COMPATIBILITY (for gradual migration)
+// =============================================================================
+
 /**
  * @deprecated Use AIVADimensionScore instead
  */
