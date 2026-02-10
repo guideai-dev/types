@@ -102,6 +102,8 @@ export interface SurveyInstanceMetadata {
 }
 
 // Survey Schedule
+export type DistributionMode = 'email' | 'link'
+
 export interface SurveySchedule {
   id: string
   tenantId: string
@@ -117,6 +119,7 @@ export interface SurveySchedule {
   questionConfig?: QuestionConfig | null
   randomizeQuestionOrder: boolean
   textQuestionsAtEnd: boolean
+  distributionMode: DistributionMode
   targetType: TargetType
   targetUserIds?: string[] | null
   targetTeamIds?: string[] | null
@@ -145,6 +148,7 @@ const surveyScheduleBaseSchema = z.object({
   questionConfig: questionConfigSchema.nullable().optional(),
   randomizeQuestionOrder: z.boolean().default(true),
   textQuestionsAtEnd: z.boolean().default(true),
+  distributionMode: z.enum(['email', 'link']).default('email'),
   targetType: z.enum(['organization', 'teams', 'individual']),
   targetUserIds: z.array(z.string().uuid()).optional(),
   targetTeamIds: z.array(z.string().uuid()).optional(),

@@ -45,6 +45,7 @@ export interface SessionContext {
   permissions: string[]
   user?: User
   subscription?: SubscriptionInfo
+  isSurveyOnly?: boolean
   tenantUser?: {
     role: 'owner' | 'admin' | 'member'
     tenantId: string
