@@ -23,7 +23,7 @@ export type AIVAQuestionType =
 /**
  * Respondent roles - each gets a tailored subset of questions
  */
-export type AIVARespondentRole = 'leadership' | 'product' | 'engineering' | 'operations'
+export type AIVARespondentRole = 'leadership' | 'product' | 'engineering' | 'architecture' | 'operations'
 
 /**
  * Confidence levels based on evidence quality and source count
@@ -757,6 +757,65 @@ export interface AIVAFeedbackSummaries {
 }
 
 // =============================================================================
+// ROLE DISPLAY CONFIGURATION
+// =============================================================================
+
+/**
+ * Configuration for how an AIVA role is displayed in the UI.
+ * Tenants can override any of these fields per role.
+ */
+export interface AIVARoleDisplayConfig {
+  label: string // Long name (e.g., "Product & Design")
+  shortLabel: string // Short name for tables/charts (e.g., "Prod")
+  description: string // Role description shown on selection card
+  tags: string[] // Focus areas shown as chips
+}
+
+/**
+ * Tenant-level overrides for role display names.
+ * Partial at both levels: only override the roles and fields you want to change.
+ */
+export type AIVARoleDisplayOverrides = Partial<
+  Record<AIVARespondentRole, Partial<AIVARoleDisplayConfig>>
+>
+
+/**
+ * Built-in default display configuration for each AIVA role.
+ */
+export const AIVA_ROLE_DISPLAY_DEFAULTS: Record<AIVARespondentRole, AIVARoleDisplayConfig> = {
+  leadership: {
+    label: 'Leadership',
+    shortLabel: 'Lead',
+    description: 'Strategic oversight and organisational direction',
+    tags: ['Strategic decisions', 'AI vision', 'Change management', 'Resource allocation'],
+  },
+  product: {
+    label: 'Product & Design',
+    shortLabel: 'Prod',
+    description: 'Product discovery, UX design, and customer value delivery',
+    tags: ['Discovery', 'UX/Design', 'Validation', 'Roadmap prioritisation'],
+  },
+  engineering: {
+    label: 'Engineering',
+    shortLabel: 'Eng',
+    description: 'Technical implementation and platform capabilities',
+    tags: ['Delivery', 'Technical platform', 'Tooling', 'CI/CD', 'Code quality'],
+  },
+  architecture: {
+    label: 'Architecture',
+    shortLabel: 'Arch',
+    description: 'System design, technical standards, and cross-cutting governance',
+    tags: ['Architecture', 'Standards', 'Security', 'Data Governance'],
+  },
+  operations: {
+    label: 'Operations',
+    shortLabel: 'Ops',
+    description: 'Governance, compliance, and operational excellence',
+    tags: ['SRE', 'Platform', 'Observability', 'Security', 'Operations'],
+  },
+}
+
+// =============================================================================
 // LEGACY COMPATIBILITY (for gradual migration)
 // =============================================================================
 
@@ -848,7 +907,19 @@ export const AIVA_ROLE_LABELS: Record<AIVARespondentRole, string> = {
   leadership: 'Leadership',
   product: 'Product',
   engineering: 'Engineering',
+  architecture: 'Architecture',
   operations: 'Operations',
+}
+
+/**
+ * Short display labels for respondent roles (for table headers, charts)
+ */
+export const AIVA_ROLE_SHORT_LABELS: Record<AIVARespondentRole, string> = {
+  leadership: 'Lead',
+  product: 'Prod',
+  engineering: 'Eng',
+  architecture: 'Arch',
+  operations: 'Ops',
 }
 
 /**

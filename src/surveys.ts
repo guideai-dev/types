@@ -98,7 +98,7 @@ export type SurveyPurpose =
 // Survey Instance Metadata (for survey-type-specific data)
 export interface SurveyInstanceMetadata {
   /** AIVA respondent role (only set for AIVA surveys) */
-  aivaRole?: 'leadership' | 'product' | 'engineering' | 'operations'
+  aivaRole?: 'leadership' | 'product' | 'engineering' | 'architecture' | 'operations'
 }
 
 // Survey Schedule
@@ -331,7 +331,7 @@ export interface SurveyQuestion {
   importance?: 'low' | 'medium' | 'high'
   version?: string[]
   // AIVA-specific fields (embedded from dimension config)
-  roles?: ('leadership' | 'product' | 'engineering' | 'operations')[]
+  roles?: ('leadership' | 'product' | 'engineering' | 'architecture' | 'operations')[]
   dimensionContributions?: Array<{ dimension: string; weight: number }>
   aivaType?: 'scenario-choice' | 'frequency-scale' | 'evidence-checklist' | 'comparison-anchor' | 'open-feedback'
   scoringMode?: 'highest-tier' | 'count-based' | 'cumulative'

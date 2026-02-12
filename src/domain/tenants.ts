@@ -1,4 +1,5 @@
 // Tenant and tenant settings types
+import type { AIVARoleDisplayOverrides } from '../surveys/aiva.js'
 
 /**
  * Tenant entity - represents an organization in GuideMode
@@ -25,6 +26,7 @@ export interface TenantSettings {
   surveyMinimumIntervalDays: number
   surveyMaxActivePerUser: number
   timezone: string // IANA timezone (e.g., "America/New_York", "UTC")
+  aivaRoleDisplayOverrides?: AIVARoleDisplayOverrides | null
   updatedAt: Date
   updatedBy: string
 }
@@ -41,6 +43,7 @@ export interface TenantSettingsUpdate {
   surveyMinimumIntervalDays?: number
   surveyMaxActivePerUser?: number
   timezone?: string
+  aivaRoleDisplayOverrides?: AIVARoleDisplayOverrides | null
 }
 
 /**
