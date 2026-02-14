@@ -23,7 +23,12 @@ export type AIVAQuestionType =
 /**
  * Respondent roles - each gets a tailored subset of questions
  */
-export type AIVARespondentRole = 'leadership' | 'product' | 'engineering' | 'architecture' | 'operations'
+export type AIVARespondentRole =
+  | 'leadership'
+  | 'product'
+  | 'engineering'
+  | 'architecture'
+  | 'operations'
 
 /**
  * Confidence levels based on evidence quality and source count
@@ -286,7 +291,12 @@ export interface AIVADimensionContribution {
  */
 export interface AIVAQuestionDimensionEntry {
   /** Original AIVA question type (for calibration logic reference) */
-  aivaType: 'scenario-choice' | 'frequency-scale' | 'evidence-checklist' | 'comparison-anchor' | 'open-feedback'
+  aivaType:
+    | 'scenario-choice'
+    | 'frequency-scale'
+    | 'evidence-checklist'
+    | 'comparison-anchor'
+    | 'open-feedback'
 
   /** Dimension contributions with weights */
   contributes: AIVADimensionContribution[]
