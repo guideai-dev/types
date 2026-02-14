@@ -83,6 +83,8 @@ export interface AgentSession {
   gitBranch: string | null
   firstCommitHash: string | null
   latestCommitHash: string | null
+  // Session stitching
+  parentSessionId: string | null
   createdAt: string
   uploadedAt: string
 }

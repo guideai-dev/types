@@ -43,6 +43,8 @@ export interface SessionDetailResponse {
     cwd: string
     detectedType: string | null
   } | null
+  // Session stitching
+  parentSessionId: string | null
   // Pull request information (if linked to a GitHub PR)
   pullRequest?: {
     url: string
@@ -53,6 +55,19 @@ export interface SessionDetailResponse {
     baseBranch: string
     repoFullName: string
   } | null
+  // Linked sessions (plan → implementation chain)
+  parentSession?: {
+    sessionId: string
+    repositoryName: string
+    sessionStartTime: string | null
+    aiModelSummary: string | null
+  } | null
+  childSessions?: Array<{
+    sessionId: string
+    repositoryName: string
+    sessionStartTime: string | null
+    aiModelSummary: string | null
+  }>
 }
 
 /**
