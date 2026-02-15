@@ -4,6 +4,31 @@ import type { AgentSession, ProcessingStatus, SessionFile } from './core.js'
 // Session API response types
 
 /**
+ * Linked session summary - used for parent/child session cards
+ */
+export interface LinkedSession {
+  id: string
+  sessionId: string
+  provider: string
+  username: string
+  repositoryName: string
+  sessionStartTime: string | null
+  sessionEndTime: string | null
+  durationMs: number | null
+  fileSize: number | null
+  filePath: string | null
+  processingStatus: string
+  assessmentStatus: string
+  assessmentRating: string | null
+  aiModelSummary: string | null
+  aiModelQualityScore: number | null
+  gitBranch: string | null
+  firstCommitHash: string | null
+  latestCommitHash: string | null
+  createdAt: string
+}
+
+/**
  * Session detail response - complete session information
  */
 export interface SessionDetailResponse {
@@ -56,18 +81,8 @@ export interface SessionDetailResponse {
     repoFullName: string
   } | null
   // Linked sessions (plan → implementation chain)
-  parentSession?: {
-    sessionId: string
-    repositoryName: string
-    sessionStartTime: string | null
-    aiModelSummary: string | null
-  } | null
-  childSessions?: Array<{
-    sessionId: string
-    repositoryName: string
-    sessionStartTime: string | null
-    aiModelSummary: string | null
-  }>
+  parentSession?: LinkedSession | null
+  childSessions?: LinkedSession[]
 }
 
 /**

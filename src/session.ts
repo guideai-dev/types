@@ -24,6 +24,7 @@ export type {
 } from './sessions/messages.js'
 
 export type {
+  LinkedSession,
   SessionDetailResponse,
   SessionsResponse,
   SessionFilesResponse,
