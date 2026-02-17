@@ -496,6 +496,10 @@ export interface AIVAScoreDistribution {
   roleMeans: Record<AIVARespondentRole, number | null>
   roleNormalizedMean: number | null
   sampleWeightedMean: number | null
+  adm?: number // Average Deviation from Median (scale points)
+  consensus?: number // Tastle-Wierman [0,1], 1 = perfect agreement
+  confidenceScore?: number // SEM-based precision [0,1], 1 = highest precision
+  sem?: number // Standard Error of the Mean
 }
 
 /**
@@ -577,6 +581,9 @@ export interface AIVAAssessmentPreview {
       suggestedScore: number
       confidence: AIVAConfidence
       highVariance: boolean
+      adm?: number
+      consensus?: number
+      confidenceScore?: number
     }
   >
   completionRate: number // % of assigned instances completed
