@@ -574,6 +574,9 @@ export interface AIVAAssessmentPreview {
       roleMeans: Record<AIVARespondentRole, number | null>
       variance: number
       byRole: Record<AIVARespondentRole, number[]>
+      suggestedScore: number
+      confidence: AIVAConfidence
+      highVariance: boolean
     }
   >
   completionRate: number // % of assigned instances completed
