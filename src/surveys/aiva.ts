@@ -540,6 +540,7 @@ export interface AIVAAssessment {
   id: string
   tenantId: string
   scheduleId: string
+  batchId: string | null
   calibratedBy: string | null
   calibratedAt: Date | null
   participantCount: number
@@ -747,6 +748,93 @@ export interface AIVADiagnosticReport {
 }
 
 // =============================================================================
+// INTERVIEW TYPES
+// =============================================================================
+
+/**
+ * Interview question (configured per-schedule)
+ */
+export interface AIVAInterviewQuestion {
+  id: string
+  text: string
+  helpText?: string
+  dimensionContributions: { dimension: AIVADimension; weight: number }[]
+  order: number
+}
+
+/**
+ * AI-generated summary per interview question
+ */
+export interface AIVAInterviewQuestionSummary {
+  questionId: string
+  questionText: string
+  summary: string
+  keyPoints: string[]
+  relevantQuotes: string[]
+  dimensions: string[]
+}
+
+/**
+ * AI-generated insight per dimension from a transcript
+ */
+export interface AIVAInterviewDimensionInsight {
+  dimensionKey: string
+  summary: string
+  sentiment: 'positive' | 'mixed' | 'negative' | 'neutral'
+  keyThemes: string[]
+  evidenceStrength: 'strong' | 'moderate' | 'weak'
+  /** Participant user ID (set in batch-level collection for per-participant rows) */
+  participantUserId?: string
+  /** Participant display name (set in batch-level collection) */
+  participantName?: string
+}
+
+/**
+ * Comparison between interview qualitative insights and survey quantitative scores
+ * for a single dimension
+ */
+export interface AIVAInterviewSurveyComparison {
+  dimensionKey: string
+  dimensionName: string
+  interviewSentiment: 'positive' | 'mixed' | 'negative' | 'neutral'
+  interviewEvidenceStrength: 'strong' | 'moderate' | 'weak'
+  surveyScore: number
+  surveyConfidence: 'low' | 'medium' | 'high'
+  discrepancyDirection: 'interview-higher' | 'interview-lower' | 'aligned'
+  discrepancySeverity: 'significant' | 'moderate' | 'none'
+  summary: string
+}
+
+export type AIVAInterviewProcessingStatus = 'pending' | 'processing' | 'completed' | 'failed'
+
+/**
+ * Full transcript record (API response shape)
+ */
+export interface AIVAInterviewTranscript {
+  id: string
+  tenantId: string
+  scheduleId: string
+  batchId: string | null
+  participantUserId: string | null
+  interviewerUserId: string | null
+  title: string | null
+  interviewerNames: string | null
+  interviewDate: string | null
+  processingStatus: AIVAInterviewProcessingStatus
+  processingError?: string | null
+  /** Raw transcript text - only included in detail endpoint, omitted from lists */
+  rawTranscript?: string
+  questionSummaries: AIVAInterviewQuestionSummary[] | null
+  dimensionInsights: Record<string, AIVAInterviewDimensionInsight> | null
+  surveyComparison: AIVAInterviewSurveyComparison[] | null
+  createdAt: string
+  updatedAt: string
+  participantName?: string
+  participantEmail?: string
+  interviewerName?: string
+}
+
+// =============================================================================
 // AI FEEDBACK SUMMARY TYPES
 // =============================================================================
 
@@ -774,6 +862,11 @@ export interface AIVAFeedbackSummaries {
   generatedAt: string // ISO timestamp
   model: string // AI model used
   feedbackCount: number // Total responses summarised
+  interviewInsights?: {
+    transcriptCount: number
+    dimensionInsights: AIVAInterviewDimensionInsight[]
+    keyThemes: string[]
+  }
 }
 
 // =============================================================================
