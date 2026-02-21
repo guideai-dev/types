@@ -23,6 +23,7 @@ export type Subjects =
   | 'Integration' // Provider integrations (connect/sync/config)
   | 'Dashboard' // Dashboard CRUD
   | 'WorkTracking' // Label/status/env mappings, work tracking config
+  | 'AIVA' // AIVA maturity assessments, interviews, roadmaps
   // Subscriber features (subscription-based access)
   | 'AdvancedAnalytics' // Advanced analytics features
   | 'UnlimitedSessions' // Unlimited session storage
