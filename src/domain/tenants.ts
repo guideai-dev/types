@@ -67,6 +67,7 @@ export interface DeleteTenantRequest {
  */
 export interface CreateTenantResponse {
   logout?: boolean
+  tenantId?: string
 }
 
 /**
