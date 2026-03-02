@@ -644,6 +644,7 @@ export interface AIVARecommendation {
   effort: AIVARecommendationEffort
   rationale: string
   priority?: number
+  evidenceSources?: string[]
 }
 
 /**
@@ -684,6 +685,76 @@ export interface AIVAGeneratedRoadmap {
   generatedAt: string
   model: string
   source: 'ai' | 'template'
+  priorityAnalysis?: AIVAPriorityAnalysis
+  interviewTranscriptCount?: number
+}
+
+// =============================================================================
+// INTERVIEW EVIDENCE AGGREGATION TYPES
+// =============================================================================
+
+/**
+ * Aggregated dimension insight across all transcripts in a batch
+ */
+export interface AIVAAggregatedDimensionInsight {
+  dimensionKey: string
+  dimensionName: string
+  mentionCount: number
+  dominantSentiment: 'positive' | 'mixed' | 'negative' | 'neutral'
+  strongestEvidence: 'strong' | 'moderate' | 'weak'
+  themes: string[]
+  summaries: string[]
+}
+
+/**
+ * Aggregated discrepancy per dimension across all transcripts
+ */
+export interface AIVAAggregatedDiscrepancy {
+  dimensionKey: string
+  dimensionName: string
+  transcriptCount: number
+  dominantDirection: 'interview-higher' | 'interview-lower' | 'mixed' | 'aligned'
+  maxSeverity: 'significant' | 'moderate' | 'none'
+  avgSurveyScore: number
+  dominantSentiment: 'positive' | 'mixed' | 'negative'
+  summary: string
+}
+
+/**
+ * Full aggregated interview evidence for a batch
+ */
+export interface AggregatedInterviewEvidence {
+  transcriptCount: number
+  dimensionInsights: AIVAAggregatedDimensionInsight[]
+  discrepancies: AIVAAggregatedDiscrepancy[]
+  keyThemes: string[]
+}
+
+/**
+ * Output of the priority analysis step
+ */
+export interface AIVAPriorityAnalysis {
+  priorities: AIVAPriorityItem[]
+  discrepancyInsights: string[]
+  interviewImpactSummary: string
+}
+
+/**
+ * A single priority item from the priority analysis
+ */
+export interface AIVAPriorityItem {
+  area: string
+  areaName: string
+  rationale: string
+  evidenceSources: (
+    | 'survey-score'
+    | 'interview-insight'
+    | 'discrepancy'
+    | 'high-variance'
+    | 'calibration'
+  )[]
+  suggestedHorizon: 'H1' | 'H2' | 'H3' | 'H4'
+  confidence: 'high' | 'medium' | 'low'
 }
 
 // =============================================================================
