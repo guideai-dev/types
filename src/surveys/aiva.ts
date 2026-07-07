@@ -1051,6 +1051,176 @@ export const AIVA_DIMENSION_NAMES: Record<AIVADimension, string> = {
 }
 
 /**
+ * Human-readable descriptions for each scored dimension.
+ * Used on the Scorecard overview page.
+ */
+export const AIVA_DIMENSION_DESCRIPTIONS: Record<AIVADimension, string> = {
+  // Value Stream parent phases (computed)
+  vsDiscovery:
+    'How effectively your organisation discovers and validates customer problems before committing to solutions.',
+  vsDelivery:
+    'How efficiently your teams move from defined requirements through to shipped, working software.',
+  vsValidation:
+    'How well your organisation closes the loop — measuring outcomes, running experiments, and feeding evidence back into decisions.',
+  vsFoundations:
+    'The foundational capabilities that underpin delivery speed and quality: developer experience, knowledge sharing, observability, and governance.',
+
+  // Discovery sub-dimensions
+  vsDiscoveryResearch:
+    'Ability to gather, synthesise, and act on user research, market signals, and competitive intelligence — including AI-assisted analysis.',
+  vsDiscoveryClarity:
+    'How clearly teams define the problem before jumping to solutions — hypothesis quality, requirement extraction, and spec rigour.',
+  vsDiscoveryPrioritization:
+    'Effectiveness of prioritisation frameworks: opportunity sizing, cost-of-delay thinking, and alignment between strategy and backlog.',
+  vsDiscoveryCollaboration:
+    'How well product, engineering, design, and stakeholders collaborate during the discovery phase to build shared understanding.',
+
+  // Delivery sub-dimensions
+  vsDeliveryVelocity:
+    'Raw development throughput: cycle time from "in progress" to "done", including AI-assisted coding productivity gains.',
+  vsDeliveryQuality:
+    'Code review rigour, defect escape rate, and the consistency of quality standards — for both human and AI-generated code.',
+  vsDeliveryRelease:
+    'Deployment frequency, release automation maturity, and confidence in pushing changes to production safely.',
+  vsDeliveryFlow:
+    'Flow efficiency across the delivery pipeline: WIP limits, blocked work, handoff friction, and queue time between stages.',
+
+  // Validation sub-dimensions
+  vsValidationFeedback:
+    'Speed and quality of feedback loops from production back to teams — user analytics, support signals, and operational telemetry.',
+  vsValidationExperimentation:
+    'Maturity of experimentation infrastructure: feature flags, A/B testing, canary releases, and the discipline to run controlled experiments.',
+  vsValidationDecisions:
+    'The degree to which product and engineering decisions are driven by evidence rather than opinion or authority.',
+  vsValidationMetrics:
+    'Clarity and consistency of outcome measurement: OKRs, success metrics per feature, and the ability to attribute impact.',
+
+  // Foundations sub-dimensions
+  vsFoundationsDx:
+    'Developer experience quality: local dev setup time, build speeds, tooling ergonomics, and friction in the inner development loop.',
+  vsFoundationsKnowledge:
+    'How effectively knowledge is captured, shared, and discovered — onboarding speed, documentation quality, and institutional memory.',
+  vsFoundationsObservability:
+    'Depth of observability: structured logging, distributed tracing, alerting quality, and mean-time-to-diagnose when things go wrong.',
+  vsFoundationsGovernance:
+    'Governance that enables rather than blocks: lightweight approval processes, clear guardrails, and automated compliance checks.',
+
+  // Capability: Strategy & Culture
+  capScLeadership:
+    'Visible executive sponsorship of AI adoption: budget allocation, strategic messaging, and willingness to invest in learning.',
+  capScAiVision:
+    'Clarity and communication of the organisation\'s AI vision — where AI fits in the SDLC and what success looks like.',
+  capScExperimentation:
+    'Cultural safety for experimentation: tolerance for failure, time allocated for exploration, and celebration of learning.',
+  capScLearning:
+    'Investment in continuous learning: training budgets, communities of practice, knowledge sharing rituals, and learning time.',
+  capScChangeReadiness:
+    'Organisational capacity to absorb change: communication effectiveness, change fatigue management, and adoption support.',
+
+  // Capability: People & Skills
+  capPsAiFluency:
+    'Baseline AI literacy across the engineering organisation: understanding of capabilities, limitations, and appropriate use cases.',
+  capPsPromptEngineering:
+    'Skill in crafting effective prompts, context engineering, and working productively with AI coding assistants.',
+  capPsGrowthFrameworks:
+    'Maturity of career frameworks that account for AI-augmented roles: updated levelling criteria and skill progression paths.',
+  capPsRoleEvolution:
+    'How proactively roles are evolving to reflect AI capabilities — new responsibilities, changing expectations, and emerging specialisms.',
+  capPsTalentStrategy:
+    'Talent acquisition and retention strategy that accounts for AI skills: hiring criteria, employer branding, and competitive positioning.',
+
+  // Capability: Ways of Working
+  capWowTeamTopology:
+    'Team structure alignment with value streams: team size, cognitive load, and clear ownership boundaries.',
+  capWowRituals:
+    'Effectiveness of team rituals: standups, retrospectives, planning sessions — and how they incorporate AI-generated insights.',
+  capWowDecisionMaking:
+    'Decision-making speed and quality: clear authority, appropriate escalation, and evidence-informed choices.',
+  capWowCrossFunctional:
+    'Collaboration across team boundaries: dependency management, shared goals, and friction in cross-team work.',
+  capWowPrioritization:
+    'Team-level prioritisation discipline: backlog hygiene, WIP limits, and alignment between team priorities and strategy.',
+
+  // Capability: Technical Platform
+  capTpDesignSystem:
+    'Maturity of shared design systems and component libraries: consistency, adoption, and contribution model.',
+  capTpGoldenPaths:
+    'Availability of blessed paths for common tasks: starter templates, reference implementations, and reusable modules.',
+  capTpCiCd:
+    'CI/CD pipeline maturity: build reliability, deployment automation, rollback capability, and pipeline-as-code adoption.',
+  capTpAiTooling:
+    'Quality and governance of AI development tools: approved tools, configuration standards, and shadow IT management.',
+  capTpObservability:
+    'Platform-level observability: APM, infrastructure monitoring, cost dashboards, and self-service debugging tools.',
+
+  // Capability: Governance & Enablers
+  capGeCompliance:
+    'AI compliance posture: acceptable use policies, regulatory alignment (NIST AI RMF, ISO 42001), and audit readiness.',
+  capGeSecurity:
+    'Security practices for AI-augmented development: least-privilege for AI tools, prompt injection defenses, and credential management.',
+  capGeCostManagement:
+    'Visibility and control of AI and infrastructure costs: per-team budgets, cost-per-value metrics, and alerting thresholds.',
+  capGeQualityGates:
+    'Automated quality gates in the pipeline: security scanning, test coverage thresholds, and AI-specific checks.',
+  capGeDataGovernance:
+    'Data governance for AI systems: classification, access controls, PII handling, and RAG pipeline data quality.',
+
+  // Capability: External Interfaces
+  capEiStakeholderLiteracy:
+    'Stakeholder understanding of AI capabilities and limitations: realistic expectations, informed decision-making, and constructive feedback.',
+  capEiCustomerValidation:
+    'Maturity of customer validation processes: user testing, feedback collection, and how AI insights are incorporated.',
+  capEiVendorAlignment:
+    'Strategic alignment with AI tool vendors: evaluation frameworks, contract terms, and migration planning.',
+  capEiRegulatory:
+    'Awareness and readiness for AI regulation: monitoring regulatory developments, compliance planning, and risk assessment.',
+  capEiDependencyManagement:
+    'Management of external dependencies: third-party risk assessment, supply chain security, and vendor lock-in mitigation.',
+}
+
+/**
+ * Descriptions for the two top-level scorecard areas
+ */
+export const AIVA_SCORECARD_AREA_DESCRIPTIONS = {
+  valueStream:
+    'Measures how effectively work flows through the full product lifecycle — from discovering the right problems to delivering and validating solutions. Each phase represents a stage of the double diamond, assessed through four sub-dimensions.',
+  capabilityMaturity:
+    'Assesses the organisational capabilities that underpin delivery effectiveness. Six layers cover everything from leadership commitment and team skills through to platform maturity and external governance.',
+} as const
+
+/**
+ * Descriptions for value stream phases
+ */
+export const AIVA_VALUE_STREAM_PHASE_DESCRIPTIONS: Record<AIVAValueStreamPhase, string> = {
+  discovery:
+    'The first diamond — understanding the problem space through research, clear definition, smart prioritisation, and cross-functional collaboration.',
+  delivery:
+    'The second diamond — turning validated problems into shipped software through development speed, quality standards, release capability, and flow efficiency.',
+  validation:
+    'Closing the loop — measuring what matters through feedback loops, experimentation, evidence-based decisions, and outcome tracking.',
+  foundations:
+    'The enablers that make everything else possible — developer experience, knowledge management, observability, and enabling governance.',
+}
+
+/**
+ * Descriptions for capability layers
+ */
+export const AIVA_CAPABILITY_LAYER_DESCRIPTIONS: Record<AIVACapabilityLayer, string> = {
+  strategyAndCulture:
+    'Leadership commitment, AI vision clarity, experimentation culture, and organisational readiness for change.',
+  peopleAndSkills:
+    'AI literacy, prompt engineering capability, career frameworks for AI-augmented roles, and talent strategy.',
+  waysOfWorking:
+    'Team structures, rituals, decision-making, cross-functional collaboration, and prioritisation discipline.',
+  technicalPlatform:
+    'Design systems, golden paths, CI/CD maturity, AI tooling governance, and platform observability.',
+  governanceAndEnablers:
+    'Compliance, security, cost management, automated quality gates, and data governance for AI systems.',
+  externalInterfaces:
+    'Stakeholder literacy, customer validation, vendor alignment, regulatory readiness, and dependency management.',
+}
+
+/**
  * Full display names for capability layers
  */
 export const AIVA_CAPABILITY_LAYER_NAMES: Record<AIVACapabilityLayer, string> = {

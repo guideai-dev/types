@@ -49,6 +49,9 @@ export * from './surveys.js'
 // AIVA assessment types
 export * from './surveys/aiva.js'
 
+// AIVA enablement framework types
+export * from './surveys/aiva-enablement.js'
+
 // Canonical validation (Zod schemas and validation functions)
 export * from './canonical-validation.js'
 
