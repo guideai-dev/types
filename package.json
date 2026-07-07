@@ -55,10 +55,10 @@
     "lint:fix": "biome check . --write"
   },
   "devDependencies": {
-    "typescript": "^5.7.2"
+    "typescript": "^5.9.3"
   },
   "keywords": ["types", "typescript", "guidemode"],
   "dependencies": {
-    "zod": "^3.25.0"
+    "zod": "^3.25.76"
   }
 }

@@ -1109,7 +1109,7 @@ export const AIVA_DIMENSION_DESCRIPTIONS: Record<AIVADimension, string> = {
   capScLeadership:
     'Visible executive sponsorship of AI adoption: budget allocation, strategic messaging, and willingness to invest in learning.',
   capScAiVision:
-    'Clarity and communication of the organisation\'s AI vision — where AI fits in the SDLC and what success looks like.',
+    "Clarity and communication of the organisation's AI vision — where AI fits in the SDLC and what success looks like.",
   capScExperimentation:
     'Cultural safety for experimentation: tolerance for failure, time allocated for exploration, and celebration of learning.',
   capScLearning:

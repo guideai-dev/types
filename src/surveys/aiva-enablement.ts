@@ -164,12 +164,7 @@ export const AIVA_ENABLEMENT_PILLARS: Record<AIVAEnablementPillar, AIVAEnablemen
     title: 'Foundations & Governance',
     shortTitle: 'Foundations',
     description: 'Cross-cutting enablers that underpin all SDLC phases.',
-    workStreams: [
-      'ai_policy_compliance',
-      'data_knowledge_infra',
-      'ai_finops',
-      'change_management',
-    ],
+    workStreams: ['ai_policy_compliance', 'data_knowledge_infra', 'ai_finops', 'change_management'],
   },
 } as const
 
@@ -221,7 +216,7 @@ export const AIVA_ENABLEMENT_WORK_STREAMS: Record<
     pillar: 'discovery_design',
     title: 'Design & Prototyping',
     description:
-      'AI design tools enable same-day concept-to-clickable-prototype cycles, compressing the traditional design sprint from five days to one. Designers describe interfaces in natural language and receive layout drafts, component suggestions, and interaction flows that conform to the team\'s design system. Design system compliance checking runs automatically, catching token violations, accessibility issues, and pattern drift before handoff.',
+      "AI design tools enable same-day concept-to-clickable-prototype cycles, compressing the traditional design sprint from five days to one. Designers describe interfaces in natural language and receive layout drafts, component suggestions, and interaction flows that conform to the team's design system. Design system compliance checking runs automatically, catching token violations, accessibility issues, and pattern drift before handoff.",
     examples: [
       'Figma AI / Galileo AI — generate UI layouts from text descriptions anchored to design system tokens, producing starting points designers refine rather than build from scratch',
       'v0.dev (Vercel) — natural language to functional React component prototypes, shareable and testable within minutes',
@@ -245,11 +240,7 @@ export const AIVA_ENABLEMENT_WORK_STREAMS: Record<
       'Anomaly alerting on guardrail metrics — AI monitors key health metrics during rollouts and auto-alerts when degradation exceeds thresholds',
       'Causal inference engines — AI distinguishes correlation from causation in product metrics, identifying whether a feature change actually drove the observed outcome',
     ],
-    dimensionInputs: [
-      'vsValidationExperimentation',
-      'vsValidationMetrics',
-      'vsValidationFeedback',
-    ],
+    dimensionInputs: ['vsValidationExperimentation', 'vsValidationMetrics', 'vsValidationFeedback'],
     dependencies: [],
     defaultHorizon: 'h2',
   },
@@ -261,7 +252,7 @@ export const AIVA_ENABLEMENT_WORK_STREAMS: Record<
     pillar: 'agentic_coding',
     title: 'Agentic Engineering Practices',
     description:
-      'Engineers operate as orchestrators — spending the majority of time on problem definition, context engineering, and verification strategy rather than raw implementation. TDD is mandatory in agentic workflows: write tests first, have the agent generate minimum code to pass them, constraining drift. Context engineering (curating what the agent sees via CLAUDE.md, .cursorrules, and structured project instructions) is the single biggest determinant of output quality, and cognitive debt (the gap between code that exists and the team\'s understanding of it) is actively managed.',
+      "Engineers operate as orchestrators — spending the majority of time on problem definition, context engineering, and verification strategy rather than raw implementation. TDD is mandatory in agentic workflows: write tests first, have the agent generate minimum code to pass them, constraining drift. Context engineering (curating what the agent sees via CLAUDE.md, .cursorrules, and structured project instructions) is the single biggest determinant of output quality, and cognitive debt (the gap between code that exists and the team's understanding of it) is actively managed.",
     examples: [
       'TDD-first agentic loops — write failing tests, agent implements, CI validates; the test suite becomes the specification and the guardrail',
       'CLAUDE.md / RULES.md patterns — project-level instruction files encoding coding standards, architectural constraints, and domain rules with folder-level overrides',
@@ -321,7 +312,13 @@ export const AIVA_ENABLEMENT_WORK_STREAMS: Record<
       'Role evolution mapping — explicit documentation of how each engineering role changes with AI adoption, covering day-to-day activities, skills required, and growth expectations',
       'Talent strategy — hiring for AI-native skills (context engineering, agent orchestration), retention programmes for engineers navigating role shifts, and upskilling pathways',
     ],
-    dimensionInputs: ['capPsAiFluency', 'capPsPromptEngineering', 'capPsGrowthFrameworks', 'capPsRoleEvolution', 'capPsTalentStrategy'],
+    dimensionInputs: [
+      'capPsAiFluency',
+      'capPsPromptEngineering',
+      'capPsGrowthFrameworks',
+      'capPsRoleEvolution',
+      'capPsTalentStrategy',
+    ],
     dependencies: [],
     defaultHorizon: 'h1',
   },
@@ -438,7 +435,7 @@ export const AIVA_ENABLEMENT_WORK_STREAMS: Record<
     pillar: 'quality_testing',
     title: 'Quality Measurement & Feedback',
     description:
-      'Organisations measure AI\'s impact on code quality through defect escape rates, mean time to detect regressions, code churn on AI-generated files, and cognitive comprehensibility indicators. Teams track whether AI-generated code requires more downstream maintenance — measuring the full cost, not just the initial velocity gain. The rework ratio (percentage of AI-generated PRs requiring follow-up fixes within 7 days) is the most honest quality signal.',
+      "Organisations measure AI's impact on code quality through defect escape rates, mean time to detect regressions, code churn on AI-generated files, and cognitive comprehensibility indicators. Teams track whether AI-generated code requires more downstream maintenance — measuring the full cost, not just the initial velocity gain. The rework ratio (percentage of AI-generated PRs requiring follow-up fixes within 7 days) is the most honest quality signal.",
     examples: [
       'Defect density tracking by authorship — compare defect rates in AI-generated versus human-written code; investigate if AI code shows higher post-merge bug rates',
       'Code churn analysis — CodeScene-style analysis showing whether AI-generated files are modified more frequently post-merge, indicating lower initial quality',
@@ -634,17 +631,13 @@ export const AIVA_ENABLEMENT_PILLAR_KEYS: AIVAEnablementPillar[] = [
 
 /** Ordered list of all work stream keys */
 export const AIVA_ENABLEMENT_WORK_STREAM_KEYS: AIVAEnablementWorkStream[] =
-  AIVA_ENABLEMENT_PILLAR_KEYS.flatMap(
-    pillar => AIVA_ENABLEMENT_PILLARS[pillar].workStreams
-  )
+  AIVA_ENABLEMENT_PILLAR_KEYS.flatMap(pillar => AIVA_ENABLEMENT_PILLARS[pillar].workStreams)
 
 /** Get work streams for a pillar */
 export function getWorkStreamsForPillar(
   pillar: AIVAEnablementPillar
 ): AIVAEnablementWorkStreamDef[] {
-  return AIVA_ENABLEMENT_PILLARS[pillar].workStreams.map(
-    key => AIVA_ENABLEMENT_WORK_STREAMS[key]
-  )
+  return AIVA_ENABLEMENT_PILLARS[pillar].workStreams.map(key => AIVA_ENABLEMENT_WORK_STREAMS[key])
 }
 
 /** Get pillar definition for a work stream */
@@ -725,10 +718,7 @@ export interface AIVAEnablementSummary {
   byGapSeverity: Record<AIVAEnablementGapSeverity, number>
   byPriority: Record<AIVAEnablementPriority, number>
   byHorizon: Record<AIVAEnablementHorizon, number>
-  byPillar: Record<
-    AIVAEnablementPillar,
-    { total: number; criticalGaps: number; minorGaps: number }
-  >
+  byPillar: Record<AIVAEnablementPillar, { total: number; criticalGaps: number; minorGaps: number }>
 }
 
 // =============================================================================
