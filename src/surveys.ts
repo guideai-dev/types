@@ -117,6 +117,7 @@ export interface SurveySchedule {
   timeOfDay?: string | null // HH:MM format (24-hour)
   triggerConfig?: TriggerConfig | null
   questionConfig?: QuestionConfig | null
+  aivaVariant?: 'full' | 'light' // AIVA-only: 'light' asks a faster subset of questions
   randomizeQuestionOrder: boolean
   textQuestionsAtEnd: boolean
   distributionMode: DistributionMode
@@ -146,6 +147,7 @@ const surveyScheduleBaseSchema = z.object({
     .optional(), // HH:MM 24-hour
   triggerConfig: triggerConfigSchema.optional(),
   questionConfig: questionConfigSchema.nullable().optional(),
+  aivaVariant: z.enum(['full', 'light']).default('full'), // AIVA-only: 'light' asks a faster subset
   randomizeQuestionOrder: z.boolean().default(true),
   textQuestionsAtEnd: z.boolean().default(true),
   distributionMode: z.enum(['email', 'link']).default('email'),

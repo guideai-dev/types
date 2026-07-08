@@ -31,6 +31,16 @@ export type AIVARespondentRole =
   | 'operations'
 
 /**
+ * Survey variant selecting how many questions a respondent is asked.
+ * - `full`: the complete question bank (default).
+ * - `light`: a curated subset that still covers all 46 scored dimensions,
+ *   faster to run at the cost of lower per-dimension statistical confidence.
+ *   Uses the same questions/weights/scoring as `full`, so scorecards and all
+ *   downstream tools work identically and remain comparable.
+ */
+export type AIVASurveyVariant = 'full' | 'light'
+
+/**
  * Confidence levels based on evidence quality and source count
  */
 export type AIVAConfidence = 'low' | 'medium' | 'high'
@@ -545,6 +555,8 @@ export interface AIVAAssessment {
   calibratedAt: Date | null
   participantCount: number
   rolesRepresented: Record<AIVARespondentRole, number>
+  /** Which survey variant produced this assessment (defaults to 'full' for legacy rows). */
+  variant?: AIVASurveyVariant
 
   // All 34 dimension scores
   scores: Record<AIVADimension, AIVADimensionScore>
