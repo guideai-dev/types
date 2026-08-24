@@ -95,6 +95,50 @@ export type SurveyPurpose =
   | 'ai_effectiveness'
   | 'aiva'
 
+// =============================================================================
+// SURVEY DEFINITIONS (tenant-scoped survey templates; NULL tenantId = system)
+// =============================================================================
+
+/**
+ * A section grouping questions within a survey definition.
+ * Sections are authoring metadata; the take-survey flow flattens questions in section order.
+ */
+export interface SurveySection {
+  id: string
+  title: string
+  description?: string
+}
+
+export const surveySectionSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string().optional(),
+})
+
+export type SurveyDefinitionStatus = 'draft' | 'active' | 'archived'
+
+/**
+ * A survey definition: the questions (and optional sections) that make up a survey.
+ * System definitions (tenantId = null) are the built-in templates; tenant definitions
+ * are org-private, created by cloning a template or importing from markdown.
+ */
+export interface SurveyDefinition {
+  id: string
+  tenantId: string | null
+  surveyKey: string
+  name: string
+  description?: string | null
+  status: SurveyDefinitionStatus
+  sourceMarkdown?: string | null
+  questions: SurveyQuestion[]
+  sections?: SurveySection[] | null
+  version: number
+  clonedFromId?: string | null
+  createdBy?: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
 // Survey Instance Metadata (for survey-type-specific data)
 export interface SurveyInstanceMetadata {
   /** AIVA respondent role (only set for AIVA surveys) */
@@ -117,6 +161,7 @@ export interface SurveySchedule {
   timeOfDay?: string | null // HH:MM format (24-hour)
   triggerConfig?: TriggerConfig | null
   questionConfig?: QuestionConfig | null
+  definitionId?: string | null
   aivaVariant?: 'full' | 'light' // AIVA-only: 'light' asks a faster subset of questions
   randomizeQuestionOrder: boolean
   textQuestionsAtEnd: boolean
@@ -147,6 +192,7 @@ const surveyScheduleBaseSchema = z.object({
     .optional(), // HH:MM 24-hour
   triggerConfig: triggerConfigSchema.optional(),
   questionConfig: questionConfigSchema.nullable().optional(),
+  definitionId: z.string().uuid().optional(),
   aivaVariant: z.enum(['full', 'light']).default('full'), // AIVA-only: 'light' asks a faster subset
   randomizeQuestionOrder: z.boolean().default(true),
   textQuestionsAtEnd: z.boolean().default(true),
@@ -242,24 +288,8 @@ export interface SurveyResponse {
   completedAt: Date
   createdAt: Date
 
-  // From Session Assessments
-  taskHelpfulness?: number | null
-  cognitiveLoad?: number | null
-  learningOutcome?: string | null
-  npsScore?: number | null
-  deploymentConfidence?: number | null
-  aiPerception?: string | null
-  futurePreference?: string | null
-  improvementSuggestion?: string | null
-
-  // Team Experience Specific
-  overallProductivity?: number | null
-  jobSatisfaction?: number | null
-  aiToolImpact?: number | null
-  teamCollaboration?: number | null
-  learningGrowth?: string | null
-  workLifeBalance?: number | null
-  openFeedback?: string | null
+  /** Raw SurveyQuestionResponse[] as submitted (all survey types) */
+  responses?: SurveyQuestionResponse[] | null
 }
 
 // Backward compatibility alias
@@ -320,6 +350,8 @@ export interface SurveyQuestion {
   type: QuestionType
   category: QuestionCategory
   required: boolean
+  /** Section this question belongs to (references SurveySection.id on the definition) */
+  sectionId?: string
   labels?: [string, string] // [min, max] for scales / [no, yes] for boolean
   choices?: SurveyChoice[] // Array of choice objects with stable IDs
   placeholder?: string
@@ -351,47 +383,6 @@ export interface SurveyQuestionConfig {
   questions: SurveyQuestion[]
 }
 
-// Question Override types (for tenant-level customization)
-export interface QuestionOverride {
-  text?: string
-  helpText?: string
-  required?: boolean
-  // Multiple choice answer customization (must match original choice count)
-  choices?: SurveyChoice[]
-  // Scale type conversion (only compatible conversions allowed)
-  type?: QuestionType
-  // Scale labels customization [min, max]
-  labels?: [string, string]
-}
-
-export interface QuestionOverrides {
-  version: string // Config version (e.g., "1.0")
-  overrides: Record<string, QuestionOverride> // keyed by question ID
-}
-
-// Scale conversion compatibility definitions
-export interface ScaleConversion {
-  from: QuestionType
-  to: QuestionType
-}
-
-/**
- * Compatible scale type conversions.
- * Only these conversions are allowed when overriding question types.
- */
-export const COMPATIBLE_SCALE_CONVERSIONS: ScaleConversion[] = [
-  { from: 'likert-7', to: 'likert-5' },
-  { from: 'likert-5', to: 'likert-7' },
-  { from: 'likert-7', to: 'nps' },
-  { from: 'likert-5', to: 'nps' },
-  { from: 'nps', to: 'likert-7' },
-  { from: 'nps', to: 'likert-5' },
-  { from: 'number', to: 'likert-5' },
-  { from: 'number', to: 'likert-7' },
-  { from: 'likert-5', to: 'number' },
-  { from: 'likert-7', to: 'number' },
-]
-
 export const questionTypeSchema = z.enum([
   'likert-7',
   'likert-5',
@@ -402,16 +393,93 @@ export const questionTypeSchema = z.enum([
   'boolean',
 ])
 
-export const questionOverrideSchema = z.object({
-  text: z.string().optional(),
-  helpText: z.string().optional(),
-  required: z.boolean().optional(),
-  choices: z.array(surveyChoiceSchema).optional(),
-  type: questionTypeSchema.optional(),
-  labels: z.tuple([z.string(), z.string()]).optional(),
+// =============================================================================
+// MARKDOWN → SURVEY CONVERSION CONTRACTS
+// =============================================================================
+
+/**
+ * Strict schema for a single AI-converted survey question.
+ * Enforces slug ids, choice minimums, and scale labels so invalid AI output
+ * fails validation (and triggers a repair pass) rather than saving broken surveys.
+ */
+export const aiConvertedQuestionSchema = z
+  .object({
+    id: z.string().regex(/^[a-z0-9_]+$/, 'Question id must be a lowercase slug'),
+    text: z.string().min(1),
+    type: questionTypeSchema,
+    category: z
+      .enum([
+        'productivity',
+        'satisfaction',
+        'ai_tools',
+        'collaboration',
+        'learning',
+        'wellbeing',
+        'feedback',
+        'discovery_satisfaction',
+        'discovery_activity',
+        'discovery_collaboration',
+        'discovery_efficiency',
+        'delivery_performance',
+        'delivery_efficiency',
+        'delivery_collaboration',
+        'delivery_activity',
+      ])
+      .default('feedback'),
+    required: z.boolean(),
+    labels: z.tuple([z.string(), z.string()]).optional(),
+    choices: z.array(surveyChoiceSchema).optional(),
+    multiSelect: z.boolean().optional(),
+    helpText: z.string().optional(),
+    placeholder: z.string().optional(),
+    min: z.number().optional(),
+    max: z.number().optional(),
+    sectionId: z.string().optional(),
+  })
+  .refine(q => q.type !== 'choice' || (q.choices !== undefined && q.choices.length >= 2), {
+    message: 'Choice questions require at least 2 choices',
+    path: ['choices'],
+  })
+  .refine(q => !['likert-5', 'likert-7'].includes(q.type) || q.labels !== undefined, {
+    message: 'Likert questions require [min, max] labels',
+    path: ['labels'],
+  })
+
+/**
+ * The editable draft produced by markdown conversion, held client-side
+ * until saved as a survey definition.
+ */
+export interface SurveyDraftPayload {
+  name: string
+  description?: string
+  questions: SurveyQuestion[]
+  sections: SurveySection[]
+}
+
+export const surveyDraftPayloadSchema = z.object({
+  name: z.string().min(1).max(255),
+  description: z.string().optional(),
+  questions: z.array(aiConvertedQuestionSchema),
+  sections: z.array(surveySectionSchema),
 })
 
-export const questionOverridesSchema = z.object({
-  version: z.string(),
-  overrides: z.record(z.string(), questionOverrideSchema),
-})
+export interface ConvertSurveyMarkdownRequest {
+  markdown: string
+  /** User feedback for a re-run; the AI keeps existing ids stable and applies only this */
+  feedback?: string
+  /** Previous draft, supplied on re-run so question/choice/section ids stay stable */
+  previousDraft?: SurveyDraftPayload
+}
+
+export interface ConvertSurveyMarkdownResponse {
+  success: boolean
+  draft?: SurveyDraftPayload
+  /** Non-fatal conversion notes (e.g. unsupported "Other" free-text mapped to a plain choice) */
+  warnings: string[]
+  error?: string
+  usage?: {
+    promptTokens: number
+    completionTokens: number
+    totalTokens: number
+  }
+}
