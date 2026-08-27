@@ -21,14 +21,31 @@ export type AIVAQuestionType =
   | 'open-feedback'
 
 /**
- * Respondent roles - each gets a tailored subset of questions
+ * Respondent roles - each gets a tailored subset of questions.
+ *
+ * This tuple is the single source of truth for the role list. Derive from it
+ * (and from `AIVARespondentRole`) rather than hand-writing role arrays or
+ * zeroed per-role objects, so adding a role fails typecheck everywhere it
+ * needs attention instead of silently defaulting.
  */
-export type AIVARespondentRole =
-  | 'leadership'
-  | 'product'
-  | 'engineering'
-  | 'architecture'
-  | 'operations'
+export const AIVA_RESPONDENT_ROLES = [
+  'leadership',
+  'product',
+  'engineering',
+  'architecture',
+  'operations',
+  'domainExpert',
+] as const
+
+export type AIVARespondentRole = (typeof AIVA_RESPONDENT_ROLES)[number]
+
+/** Zeroed per-role counter — use instead of hand-written object literals. */
+export function createEmptyRoleCounts(): Record<AIVARespondentRole, number> {
+  return Object.fromEntries(AIVA_RESPONDENT_ROLES.map(role => [role, 0])) as Record<
+    AIVARespondentRole,
+    number
+  >
+}
 
 /**
  * Survey variant selecting how many questions a respondent is asked.
@@ -1009,6 +1026,19 @@ export const AIVA_ROLE_DISPLAY_DEFAULTS: Record<AIVARespondentRole, AIVARoleDisp
     description: 'Governance, compliance, and operational excellence',
     tags: ['SRE', 'Platform', 'Observability', 'Security', 'Operations'],
   },
+  domainExpert: {
+    label: 'Domain Expert',
+    shortLabel: 'Dom',
+    description:
+      'Business-domain specialist involved in ideation, prioritisation and validation — not a day-to-day team member',
+    tags: [
+      'Domain knowledge',
+      'Prioritisation',
+      'User connection',
+      'Acceptance testing',
+      'Outcome validation',
+    ],
+  },
 }
 
 // =============================================================================
@@ -1275,6 +1305,7 @@ export const AIVA_ROLE_LABELS: Record<AIVARespondentRole, string> = {
   engineering: 'Engineering',
   architecture: 'Architecture',
   operations: 'Operations',
+  domainExpert: 'Domain Expert',
 }
 
 /**
@@ -1286,6 +1317,7 @@ export const AIVA_ROLE_SHORT_LABELS: Record<AIVARespondentRole, string> = {
   engineering: 'Eng',
   architecture: 'Arch',
   operations: 'Ops',
+  domainExpert: 'Dom',
 }
 
 /**

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import type { AIVARespondentRole } from './surveys/aiva.js'
 
 // =============================================================================
 // SURVEY CHOICE TYPE
@@ -163,7 +164,7 @@ export interface SurveyDefinition {
 // Survey Instance Metadata (for survey-type-specific data)
 export interface SurveyInstanceMetadata {
   /** AIVA respondent role (only set for AIVA surveys) */
-  aivaRole?: 'leadership' | 'product' | 'engineering' | 'architecture' | 'operations'
+  aivaRole?: AIVARespondentRole
 }
 
 // Survey Schedule
@@ -396,7 +397,7 @@ export interface SurveyQuestion {
   importance?: 'low' | 'medium' | 'high'
   version?: string[]
   // AIVA-specific fields (embedded from dimension config)
-  roles?: ('leadership' | 'product' | 'engineering' | 'architecture' | 'operations')[]
+  roles?: AIVARespondentRole[]
   dimensionContributions?: Array<{ dimension: string; weight: number }>
   aivaType?:
     | 'scenario-choice'
