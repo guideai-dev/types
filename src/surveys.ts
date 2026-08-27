@@ -53,15 +53,31 @@ export type TargetType = 'organization' | 'teams' | 'individual'
 export type SurveyStatus = 'pending' | 'completed' | 'expired'
 
 // Trigger Configuration
-export interface TriggerConfig {
-  type: 'session_count'
-  threshold: number
-}
+//
+// A discriminated union rather than a single shape: session-count triggers fire
+// off accumulated volume, while the discovery triggers fire off a single issue
+// lifecycle event and carry no threshold. Modelling them as one optional-field
+// object would make `threshold` meaninglessly optional everywhere.
+export type TriggerConfig =
+  | { type: 'session_count'; threshold: number }
+  /** Fires when a discovery issue starts — the "pre" half of a belief-shift pair. */
+  | { type: 'discovery_started' }
+  /** Fires when a discovery issue closes — the "post" half. */
+  | { type: 'discovery_closed' }
 
-export const triggerConfigSchema = z.object({
-  type: z.literal('session_count'),
-  threshold: z.number().int().positive(),
-})
+export const triggerConfigSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('session_count'),
+    threshold: z.number().int().positive(),
+  }),
+  z.object({ type: z.literal('discovery_started') }),
+  z.object({ type: z.literal('discovery_closed') }),
+])
+
+/** Trigger types that probe a single entity and produce paired pre/post instances. */
+export const BELIEF_SHIFT_TRIGGER_TYPES = ['discovery_started', 'discovery_closed'] as const
+
+export type BeliefShiftTriggerType = (typeof BELIEF_SHIFT_TRIGGER_TYPES)[number]
 
 // Question Configuration (for schedule customization)
 export interface QuestionConfigItem {
@@ -94,6 +110,11 @@ export type SurveyPurpose =
   | 'happiness'
   | 'ai_effectiveness'
   | 'aiva'
+  /**
+   * Paired pre/post probe bound to a single discovery issue. Opt-in: schedules
+   * with this purpose are always created inactive (see POST /api/surveys/schedules).
+   */
+  | 'belief_shift'
 
 // =============================================================================
 // SURVEY DEFINITIONS (tenant-scoped survey templates; NULL tenantId = system)
@@ -181,7 +202,15 @@ const surveyScheduleBaseSchema = z.object({
   description: z.string().optional(),
   surveyType: z.string().default('team_experience'),
   purpose: z
-    .enum(['discovery', 'delivery', 'whole_team', 'happiness', 'ai_effectiveness', 'aiva'])
+    .enum([
+      'discovery',
+      'delivery',
+      'whole_team',
+      'happiness',
+      'ai_effectiveness',
+      'aiva',
+      'belief_shift',
+    ])
     .optional(),
   scheduleType: z.enum(['weekly', 'biweekly', 'monthly', 'triggered', 'manual']),
   dayOfWeek: z.number().int().min(0).max(6).optional(), // 0=Sunday, 6=Saturday
@@ -343,6 +372,8 @@ export type QuestionCategory =
   | 'delivery_efficiency'
   | 'delivery_collaboration'
   | 'delivery_activity'
+  /** Belief-shift probes: confidence in a decision, measured before and after discovery. */
+  | 'discovery_belief'
 
 export interface SurveyQuestion {
   id: string
