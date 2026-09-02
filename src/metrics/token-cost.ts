@@ -12,6 +12,17 @@ export interface SessionModelUsage {
   input_tokens: number
   output_tokens: number
   cache_creation_tokens: number
+  /**
+   * Portion of `cache_creation_tokens` written with a 1-hour TTL, which Anthropic bills
+   * at a higher rate than the 5-minute default. Optional because it is only ever known
+   * for providers that report the breakdown, and absent on every session ingested before
+   * it was captured — those price the whole cache write at the base rate.
+   *
+   * Always <= `cache_creation_tokens`, and deliberately an UNDER-count where the
+   * provider's summary record covers requests the transcript does not. See
+   * `token-attribution.ts`: the derived cost is a floor, never an over-charge.
+   */
+  cache_creation_1h_tokens?: number
   cache_read_tokens: number
   reasoning_tokens: number
   web_search_requests?: number
