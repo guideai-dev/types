@@ -7,6 +7,7 @@ import type { ErrorMetrics } from './errors.js'
 import type { GitDiffMetrics } from './git-diff.js'
 import type { PerformanceMetrics } from './performance.js'
 import type { QualityMetrics } from './quality.js'
+import type { TokenCostMetrics } from './token-cost.js'
 import type { UsageMetrics } from './usage.js'
 
 /**
@@ -22,6 +23,7 @@ export type MetricType =
   | 'assessment'
   | 'git-diff'
   | 'context-management'
+  | 'token-cost'
   | 'performance.duration'
   | 'performance.response-time'
   | 'usage.tool-usage'
@@ -55,6 +57,7 @@ export type SessionMetricsData =
   | AssessmentMetrics
   | GitDiffMetrics
   | ContextManagementMetrics
+  | TokenCostMetrics
   | CustomMetrics
 
 /**

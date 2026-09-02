@@ -1,5 +1,6 @@
 import type { MessageContent } from '../providers/shared/index.js'
 import type { ProviderMetadata } from './core.js'
+import type { ProviderSessionTotals } from './provider-totals.js'
 
 // Message types for session parsing
 
@@ -46,6 +47,12 @@ export interface ParsedSession {
   duration: number
   // biome-ignore lint/suspicious/noExplicitAny: TODO: Define specific metadata schema
   metadata?: Record<string, any>
+  /**
+   * Summary record the provider wrote into the transcript (Claude's cost-state, Codex's
+   * cumulative token usage). Not a message, so it is attached here rather than parsed
+   * into `messages`. Undefined for providers that write none.
+   */
+  providerTotals?: ProviderSessionTotals
 }
 
 /**

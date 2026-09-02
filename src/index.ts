@@ -22,6 +22,8 @@ export * from './metrics/quality.js'
 export * from './metrics/assessment.js'
 export * from './metrics/git-diff.js'
 export * from './metrics/context.js'
+export * from './metrics/token-cost.js'
+export * from './sessions/provider-totals.js'
 export * from './metrics/utilities.js'
 
 // GitHub integration types

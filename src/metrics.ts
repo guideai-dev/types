@@ -16,6 +16,7 @@ export type { EngagementMetrics } from './metrics/engagement.js'
 export type { QualityMetrics } from './metrics/quality.js'
 export type { GitDiffMetrics } from './metrics/git-diff.js'
 export type { ContextManagementMetrics } from './metrics/context.js'
+export type { SessionModelUsage, TokenCostMetrics } from './metrics/token-cost.js'
 
 export type {
   AssessmentMetrics,
