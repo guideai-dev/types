@@ -17,6 +17,11 @@ export interface QualityMetrics extends BaseMetrics {
     exit_plan_mode_count?: number
     todo_write_count?: number
     over_top_affirmations_phrases?: string[]
+    /**
+     * Version of the deterministic scorer that produced `process_quality_score`.
+     * Scores from different versions are not comparable; group by this when trending.
+     */
+    process_quality_scorer_version?: string
     // Extra fields for detailed analysis
     cancellations?: number
     average_response_length?: number
